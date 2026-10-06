@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DCAT 모의고사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap">
+<style>
+:root{
+  --ground:#eef0f3; --sheet:#fff; --ink:#18212c; --muted:#5d6876; --line:#d5dae1;
+  --accent:#28498a; --accent-ink:#fff; --accent-soft:#e6ecf7;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --ground:#0f141a; --sheet:#171e26; --ink:#e4e9ef; --muted:#9aa5b2; --line:#2b3542;
+  --accent:#8fb0f0; --accent-ink:#0f1a2e; --accent-soft:#22314a;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.65 "IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:48px 16px}
+h1{font-size:clamp(24px,5vw,32px);margin:0 0 6px;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 28px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+a.card{display:block;background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:22px;color:inherit;text-decoration:none;transition:border-color .15s}
+a.card:hover{border-color:var(--accent)}
+a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.no{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--muted)}
+.card h2{margin:4px 0 8px;font-size:20px}
+.card p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.go{display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:8px 16px;font-weight:600;font-size:14px}
+.foot{margin-top:28px;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>DCAT 하프 모의고사</h1>
+  <p class="lede">언어논리 · 언어표현 · 수리자료분석 · 공간추리 · 도형추리 5개 영역, 영역별 제한 시간과 채점·해설을 제공합니다.</p>
+  <div class="grid">
+    <a class="card" href="test1.html">
+      <div class="no">TEST 1</div>
+      <h2>모의고사 1회</h2>
+      <p>38문항 · 약 33분</p>
+      <span class="go">시작하기 →</span>
+    </a>
+    <a class="card" href="test2.html">
+      <div class="no">TEST 2</div>
+      <h2>모의고사 2회</h2>
+      <p>38문항 · 약 33분</p>
+      <span class="go">시작하기 →</span>
+    </a>
+  </div>
+  <p class="foot">진행 상황은 이 브라우저에 자동 저장되어, 페이지를 닫았다가 다시 열어도 이어서 풀 수 있습니다.</p>
+</main>
+</body>
+</html>
