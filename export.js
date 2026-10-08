@@ -51,8 +51,9 @@
   function download(text) {
     const d = new Date();
     // ASCII-only name: some browsers drop non-ASCII download names and fall back to "download".
-    const round = (document.title.match(/(\d+)회/) || [, '1'])[1];
-    const name = `DCAT_mock${round}_result_${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}.txt`;
+    // Each test page's storage KEY is unique and ASCII (e.g. dcat-half-v5, dcat-lang-A).
+    const id = typeof KEY === 'string' ? KEY : 'dcat';
+    const name = `${id}_result_${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}.txt`;
     const url = URL.createObjectURL(new Blob(['﻿' + text], { type: 'text/plain;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();

@@ -11,11 +11,13 @@
 :root{
   --ground:#eef0f3; --sheet:#fff; --ink:#18212c; --muted:#5d6876; --line:#d5dae1;
   --accent:#28498a; --accent-ink:#fff; --accent-soft:#e6ecf7;
+  --easy:#1d7a4c; --hard:#b42f2f;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root{
   --ground:#0f141a; --sheet:#171e26; --ink:#e4e9ef; --muted:#9aa5b2; --line:#2b3542;
   --accent:#8fb0f0; --accent-ink:#0f1a2e; --accent-soft:#22314a;
+  --easy:#5fcf98; --hard:#f08080;
   color-scheme:dark}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.65 "IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
@@ -29,47 +31,81 @@ a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .no{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--muted)}
 .card h2{margin:4px 0 8px;font-size:20px}
 .card p{margin:0 0 16px;color:var(--muted);font-size:14px}
+h2.group{font-size:18px;margin:36px 0 4px}
+h2.group:first-of-type{margin-top:0}
+.group-note{color:var(--muted);font-size:14px;margin:0 0 14px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.tag{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.lv{border:1px solid currentColor;background:none}
+.lv-easy{color:var(--easy)}.lv-mid{color:var(--muted)}.lv-real{color:var(--accent)}.lv-hard{color:var(--hard)}
 .go{display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:8px 16px;font-weight:600;font-size:14px}
 .foot{margin-top:28px;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
 <main class="wrap">
-  <h1>DCAT 하프 모의고사</h1>
-  <p class="lede">언어논리 · 언어표현 · 수리자료분석 · 공간추리 · 도형추리 5개 영역, 영역별 제한 시간과 채점·해설을 제공합니다.</p>
+  <h1>DCAT 모의고사</h1>
+  <p class="lede">두산 기초적성검사(DCAT) 연습용 모의고사입니다. 영역별 제한 시간, 채점, 해설을 제공합니다.</p>
+
+  <h2 class="group">하프 모의고사</h2>
+  <p class="group-note">5개 영역(언어논리 · 언어표현 · 수리자료분석 · 공간추리 · 도형추리)을 실제 시험 순서대로, 분량은 절반으로 줄였습니다.</p>
   <div class="grid">
     <a class="card" href="test1.html">
-      <div class="no">TEST 1</div>
-      <h2>모의고사 1회</h2>
-      <p>38문항 · 약 33분</p>
+      <div class="no">HALF 1</div>
+      <h2>하프 1회</h2>
+      <div class="tags"><span class="tag lv lv-mid">보통</span><span class="tag">38문항 · 33분</span></div>
+      <p>기준이 되는 기본 세트입니다. 처음 풀어 보기 좋습니다.</p>
       <span class="go">시작하기 →</span>
     </a>
     <a class="card" href="test2.html">
-      <div class="no">TEST 2</div>
-      <h2>모의고사 2회</h2>
-      <p>38문항 · 약 33분</p>
+      <div class="no">HALF 2</div>
+      <h2>하프 2회</h2>
+      <div class="tags"><span class="tag lv lv-hard">어려움</span><span class="tag">38문항 · 33분</span></div>
+      <p>1회보다 어려운 고난도 세트입니다. 시간 안에 다 못 푸는 것이 정상입니다.</p>
       <span class="go">시작하기 →</span>
     </a>
     <a class="card" href="test3.html">
-      <div class="no">TEST 3</div>
-      <h2>모의고사 3회</h2>
-      <p>38문항 · 약 33분</p>
+      <div class="no">HALF 3</div>
+      <h2>하프 3회</h2>
+      <div class="tags"><span class="tag lv lv-easy">쉬움</span><span class="tag">38문항 · 33분</span></div>
+      <p>1회보다 조금 쉽습니다. 공간·도형추리는 시작 전에 예제로 유형을 보여 줍니다.</p>
       <span class="go">시작하기 →</span>
     </a>
     <a class="card" href="test4.html">
-      <div class="no">TEST 4</div>
-      <h2>모의고사 4회</h2>
-      <p>38문항 · 약 33분</p>
+      <div class="no">HALF 4</div>
+      <h2>하프 4회</h2>
+      <div class="tags"><span class="tag lv lv-easy">쉬움</span><span class="tag">38문항 · 33분</span></div>
+      <p>1회보다 조금 쉽습니다. 공간·도형추리는 시작 전에 예제로 유형을 보여 줍니다.</p>
       <span class="go">시작하기 →</span>
     </a>
     <a class="card" href="test5.html">
-      <div class="no">TEST 5</div>
-      <h2>모의고사 5회</h2>
-      <p>38문항 · 약 33분</p>
+      <div class="no">HALF 5</div>
+      <h2>하프 5회</h2>
+      <div class="tags"><span class="tag lv lv-real">실전</span><span class="tag">38문항 · 33분</span></div>
+      <p>실제 시험 수준을 목표로 1회와 2회 사이 난이도로 맞췄습니다.</p>
       <span class="go">시작하기 →</span>
     </a>
   </div>
-  <p class="foot">진행 상황은 이 브라우저에 자동 저장되어, 페이지를 닫았다가 다시 열어도 이어서 풀 수 있습니다. 채점 화면에서 결과를 복사하거나 텍스트 파일로 저장할 수 있습니다.</p>
+
+  <h2 class="group">언어논리 단독</h2>
+  <p class="group-note">언어논리 한 영역만, 실제 시험과 같은 20문항 · 20분으로 풉니다.</p>
+  <div class="grid">
+    <a class="card" href="logic-a.html">
+      <div class="no">LOGIC A</div>
+      <h2>언어논리 A</h2>
+      <div class="tags"><span class="tag lv lv-real">실전</span><span class="tag">20문항 · 20분</span></div>
+      <p>명제 추리 4, 조건 추리 6, 독해 10문항. 실제 시험 수준을 목표로 했습니다.</p>
+      <span class="go">시작하기 →</span>
+    </a>
+    <a class="card" href="logic-b.html">
+      <div class="no">LOGIC B</div>
+      <h2>언어논리 B</h2>
+      <div class="tags"><span class="tag lv lv-real">실전</span><span class="tag">20문항 · 20분</span></div>
+      <p>명제 추리 4, 조건 추리 6, 독해 10문항. 실제 시험 수준을 목표로 했습니다.</p>
+      <span class="go">시작하기 →</span>
+    </a>
+  </div>
+  <p class="foot">난이도는 각 모의고사 안내문에 적힌 출제 의도 기준입니다. 진행 상황은 이 브라우저에 자동 저장되어, 페이지를 닫았다가 다시 열어도 이어서 풀 수 있습니다. 채점 화면에서 결과를 복사하거나 텍스트 파일로 저장할 수 있습니다.</p>
 </main>
 </body>
 </html>

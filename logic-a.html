@@ -1,0 +1,352 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:9;background:#28498a;color:#fff;font:600 13px system-ui,sans-serif;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2)">← 목록</a>
+<title>DCAT 언어논리 A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a CBT exam console. Sticky status bar (section, count, timer), one question per screen on a white answer sheet, numbered palette below. */
+:root{
+  --ground:#eef0f3; --sheet:#ffffff; --ink:#18212c; --muted:#5d6876; --line:#d5dae1; --soft:#f4f6f8;
+  --accent:#28498a; --accent-ink:#ffffff; --accent-soft:#e6ecf7;
+  --warn:#b4410f; --ok:#1d7a4c; --ok-soft:#e3f2ea; --bad:#b42f2f; --bad-soft:#f8e4e4;
+  --cube-top:#f1f3f6; --cube-fx:#c3cad4; --cube-fy:#8e98a6; --fig-line:#1e2731; --fig-on:#38424f; --fig-off:#ffffff;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#0f141a; --sheet:#171e26; --ink:#e4e9ef; --muted:#9aa5b2; --line:#2b3542; --soft:#1d2530;
+  --accent:#8fb0f0; --accent-ink:#0f1a2e; --accent-soft:#22314a;
+  --warn:#f08a5d; --ok:#5fcf98; --ok-soft:#173327; --bad:#f08080; --bad-soft:#3a1d1f;
+  --cube-top:#3a4553; --cube-fx:#2a333f; --cube-fy:#1c232c; --fig-line:#c9d2dd; --fig-on:#c9d2dd; --fig-off:#171e26;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#0f141a; --sheet:#171e26; --ink:#e4e9ef; --muted:#9aa5b2; --line:#2b3542; --soft:#1d2530;
+  --accent:#8fb0f0; --accent-ink:#0f1a2e; --accent-soft:#22314a;
+  --warn:#f08a5d; --ok:#5fcf98; --ok-soft:#173327; --bad:#f08080; --bad-soft:#3a1d1f;
+  --cube-top:#3a4553; --cube-fx:#2a333f; --cube-fy:#1c232c; --fig-line:#c9d2dd; --fig-on:#c9d2dd; --fig-off:#171e26;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+
+/* status bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sheet);border-bottom:1px solid var(--line)}
+.bar-in{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar .sec{font-weight:700}
+.bar .step{color:var(--muted);font-size:13px}
+.bar .grow{flex:1}
+.timer{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;letter-spacing:.02em;padding:2px 10px;border-radius:6px;background:var(--soft)}
+.timer.low{color:var(--warn)}
+.timer.blink{animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.timer.blink{animation:none}}
+
+/* sheet */
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:clamp(16px,4vw,28px)}
+h1{font-size:clamp(22px,4vw,28px);line-height:1.3;margin:0 0 6px;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:18px;margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 18px;max-width:62ch}
+.kicker{font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;font-weight:600}
+.btn{border:1px solid var(--line);background:var(--sheet);border-radius:8px;padding:9px 16px;font-weight:600}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+table.plan{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin:6px 0 14px}
+table.plan th,table.plan td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}
+table.plan thead th{font-size:12px;color:var(--muted);font-weight:600}
+table.plan tfoot td{font-weight:700;border-bottom:none}
+.tbl-scroll{overflow-x:auto}
+ul.rules{margin:0 0 18px;padding-left:18px;max-width:66ch}
+ul.rules li{margin-bottom:4px}
+
+/* question */
+.qhead{display:flex;gap:10px;align-items:baseline;margin-bottom:12px}
+.qno{font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:18px;flex:none}
+.stem{font-weight:600;font-size:16px;line-height:1.55;min-width:0}
+.body{margin:0 0 16px;min-width:0}
+.given{border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--soft);margin:0 0 10px}
+.given p{margin:2px 0}
+.passage{border-left:3px solid var(--line);padding-left:14px;margin:0 0 10px}
+.passage p{margin:0 0 8px;max-width:68ch;text-align:justify;word-break:keep-all}
+.outline{border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.outline p{margin:2px 0}.outline .ol-title{font-weight:700;margin-bottom:6px}.outline .ol2{padding-left:1.4em}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.tbl-wrap{overflow-x:auto;margin:0 0 10px}
+table.data{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;min-width:100%}
+table.data caption{text-align:left;font-weight:600;padding-bottom:6px;caption-side:top}
+table.data .unit{float:right;font-weight:400;color:var(--muted);font-size:12px}
+table.data th,table.data td{border:1px solid var(--line);padding:6px 10px;text-align:right;white-space:nowrap}
+table.data thead th{background:var(--soft);text-align:center}
+table.data tbody th{text-align:center;background:var(--soft);font-weight:600}
+.chart-fig{margin:0 0 10px}.chart-fig figcaption{font-weight:600;margin-bottom:6px}
+.chart-scroll{overflow-x:auto}
+.legend{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0 0}
+.lg-bar{display:inline-block;width:12px;height:10px;background:var(--cube-fx);border:1px solid var(--fig-line)}
+.lg-line{display:inline-block;width:16px;height:2px;background:var(--accent);margin-left:8px}
+
+/* figures */
+svg.fig{max-width:100%;height:auto;display:block}
+.c-top{fill:var(--cube-top);stroke:var(--fig-line);stroke-width:1.1;stroke-linejoin:round}
+.c-fx{fill:var(--cube-fx);stroke:var(--fig-line);stroke-width:1.1;stroke-linejoin:round}
+.c-fy{fill:var(--cube-fy);stroke:var(--fig-line);stroke-width:1.1;stroke-linejoin:round}
+.v-on{fill:var(--cube-fx);stroke:var(--fig-line);stroke-width:1.2}
+.hm-on{fill:var(--cube-top);stroke:var(--fig-line);stroke-width:1.2}
+.hm-off{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:3 3}
+.hm-n{fill:var(--ink);font:600 15px var(--f-mono)}
+.lbl{fill:var(--accent);font:600 12px var(--f-body)}
+.arw{stroke:var(--accent);stroke-width:2}.arh{fill:var(--accent)}
+.n-face{fill:var(--cube-top);stroke:var(--fig-line);stroke-width:1.3}
+.s-solid{fill:var(--fig-on)}.s-ink{fill:var(--fig-line)}
+.s-line{fill:none;stroke:var(--fig-line);stroke-width:2}
+.s-stroke{stroke:var(--fig-line);stroke-width:2.4;stroke-linecap:round}
+.g-on{fill:var(--fig-on);stroke:var(--fig-line);stroke-width:1}
+.g-off{fill:var(--fig-off);stroke:var(--fig-line);stroke-width:1}
+.mk-on{fill:var(--fig-off);stroke:var(--fig-off);stroke-width:1}
+.mk-off{fill:none;stroke:var(--fig-line);stroke-width:1.8}
+.op{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linejoin:round}
+.ch-grid{stroke:var(--line);stroke-width:1}.ch-zero{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3}
+.ch-ax{fill:var(--muted);font:12px var(--f-body)}
+.ch-bar{fill:var(--cube-fx);stroke:var(--fig-line);stroke-width:1}
+.ch-val{fill:var(--ink);font:600 12px var(--f-mono)}
+.ch-line{fill:none;stroke:var(--accent);stroke-width:2}
+.ch-pt{fill:var(--sheet);stroke:var(--accent);stroke-width:2}
+.ch-pv{fill:var(--accent);font:600 11px var(--f-mono);paint-order:stroke;stroke:var(--sheet);stroke-width:3px;stroke-linejoin:round}
+.vrow{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end}
+.vw{margin:0}.vw figcaption,.lab figcaption{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+.lab{margin:0}
+.ops{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 12px;border:1px dashed var(--line);border-radius:8px;margin-bottom:12px;font-size:13px}
+.op-item{display:inline-flex;align-items:center;gap:6px}
+.opi{display:inline-block;vertical-align:middle;flex:none}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.arrow{color:var(--muted);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.qbox{display:inline-grid;place-items:center;width:66px;height:66px;border:1.5px dashed var(--muted);border-radius:4px;font-weight:700;color:var(--muted);font-size:20px}
+.seq{display:inline-flex;gap:4px;padding:2px}
+
+/* options */
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);line-height:1.55}
+.opt:hover{background:var(--soft)}
+.opt .cn{font-weight:700;color:var(--muted);flex:none;width:1.4em}
+.opt .ot{min-width:0}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt[aria-pressed="true"] .cn{color:var(--accent)}
+.opts.fig{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+.opts.fig .opt{flex-direction:column;align-items:center;padding:8px 8px 12px}
+.opts.fig .opt .cn{align-self:flex-start}
+.opts.fig .opt svg{max-height:160px;width:auto}
+.body svg.iso{max-width:min(100%,340px)}
+
+/* palette & nav */
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+.pal{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.chip{width:36px;height:36px;border-radius:6px;border:1px solid var(--line);background:var(--sheet);font-family:var(--f-mono);font-weight:600;font-variant-numeric:tabular-nums}
+.chip.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.chip.cur{box-shadow:0 0 0 2px var(--accent)}
+.confirm{margin-top:14px;border:1px solid var(--warn);border-radius:8px;padding:12px 14px}
+.confirm p{margin:0 0 10px}
+
+/* briefing */
+.brief-meta{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 14px;font-variant-numeric:tabular-nums}
+.brief-meta b{font-family:var(--f-mono);font-size:22px;display:block;line-height:1.2}
+.brief-meta span{font-size:12px;color:var(--muted)}
+.tip{background:var(--soft);border-radius:8px;padding:10px 14px;margin:0 0 16px;max-width:70ch}
+
+/* results */
+.score{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:6px 0 18px}
+.score b{font-family:var(--f-mono);font-size:44px;line-height:1}
+.score span{color:var(--muted)}
+.meter{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;min-width:80px}
+.meter i{display:block;height:100%;background:var(--accent)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.skip{background:var(--soft);color:var(--muted)}
+.rv{border-top:1px solid var(--line);padding-block:16px}
+.rv-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}
+.rv details{margin:6px 0 10px}
+.rv summary{cursor:pointer;color:var(--accent);font-size:13px;font-weight:600}
+.rv .opt{cursor:default}
+.rv .opt.is-ans{border-color:var(--ok);background:var(--ok-soft)}
+.rv .opt.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.exp{background:var(--soft);border-radius:8px;padding:10px 14px;margin-top:10px;max-width:72ch}
+.exp b{color:var(--accent)}
+.filter{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 4px}
+.filter button{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:4px 12px;font-size:13px}
+.filter button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sec-title{margin-top:26px}
+.pair{display:inline-flex;gap:10px;align-items:flex-end}.pc{display:inline-flex;flex-direction:column;align-items:center;gap:2px}.pc small{font-size:11px;color:var(--muted)}
+.opn{font-size:14px}
+.example{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:0 0 14px}
+.example .ex-h{margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--accent)}
+.example p{margin:0 0 8px}
+.ex-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 10px}
+.example svg.iso{max-width:min(100%,260px)}
+</style>
+
+<div id="bar" class="bar" hidden></div>
+<main class="wrap" id="app"></main>
+
+<script>
+const DATA = {"secs": [{"id": "L", "name": "언어논리", "time": 1200, "real": "20문항, 20분", "n": 20, "desc": "명제 추리 4문항, 조건 추리 6문항, 독해 10문항(일치, 주제, 추론, 적용, 강화와 약화, 빈칸, 문단 배열, 비판).", "tip": "문항당 1분입니다. 조건 추리에서 막히면 표시해 두고 독해부터 푸는 연습도 해 보세요. 실제 시험 프로그램에는 메모장과 계산기가 있습니다."}], "qs": [{"sec": "L", "stem": "다음 전제가 모두 참일 때, 반드시 참인 것은?", "body": "<div class=\"given\"><p>보고서를 늦게 낸 사람은 자료를 검토하지 않았다.<\/p><p>자료를 검토하지 않은 사람은 회의에 참석하지 않았다.<\/p><\/div>", "opts": ["회의에 불참한 사람은 모두 보고서를 늦게 냈다.", "회의에 불참한 사람 중 일부는 보고서를 제때 냈다.", "보고서를 제때 낸 사람은 모두 회의에 참석했다.", "회의에 참석한 사람은 모두 보고서를 제때 냈다.", "회의에 참석한 사람 중 일부는 보고서를 늦게 냈다."], "ans": 3, "exp": "전제2의 대우는 \"회의 참석 → 자료 검토\", 전제1의 대우는 \"자료 검토 → 보고서 제때 제출\"이다. 이어 붙이면 \"회의 참석 → 보고서 제때 제출\". ①과 ③는 역이거나 이(裏)라서 보장되지 않는다.", "fig": false}, {"sec": "L", "stem": "다음 결론이 반드시 참이 되도록 빈칸에 들어갈 전제로 가장 적절한 것은?", "body": "<div class=\"given\"><p>전제1: 해외 연수를 가는 사람은 모두 외국어 시험을 보았다.<\/p><p>전제2: ( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )<\/p><p>결론: 신입사원은 모두 외국어 시험을 보았다.<\/p><\/div>", "opts": ["신입사원은 모두 해외 연수를 간다.", "외국어 시험을 본 사람은 모두 신입사원이다.", "해외 연수자 중 신입사원은 없다.", "어떤 신입사원은 외국어 시험을 보지 않았다.", "외국어 시험을 보지 않은 사람은 해외 연수를 가지 않는다."], "ans": 0, "exp": "전제1 \"해외 연수 → 외국어 시험 응시\" 앞에 \"신입사원 → 해외 연수\"를 이으면 \"신입사원 → 외국어 시험 응시\"가 된다. \"외국어 시험을 보지 않은 사람은 해외 연수를 가지 않는다\"는 전제1의 대우일 뿐 신입사원과 연결해 주지 못한다.", "fig": false}, {"sec": "L", "stem": "다음 전제가 모두 참일 때, 반드시 참인 것만을 〈보기〉에서 모두 고르면?", "body": "<div class=\"given\"><p>드론 자격증이 있는 사람은 모두 안전 교육을 받았다.<\/p><p>안전 교육을 받은 사람은 모두 현장에 투입될 수 있다.<\/p><p>어떤 엔지니어는 드론 자격증이 있다.<\/p><\/div><div class=\"given\"><p>ㄱ. 현장에 투입될 수 없는 사람은 드론 자격증이 없다.<\/p><p>ㄴ. 안전 교육을 받은 엔지니어는 모두 드론 자격증이 있다.<\/p><p>ㄷ. 현장에 투입될 수 있는 엔지니어가 있다.<\/p><\/div>", "opts": ["ㄱ", "ㄴ", "ㄱ, ㄷ", "ㄱ, ㄴ", "ㄴ, ㄷ"], "ans": 2, "exp": "전제1, 2에서 \"드론 자격증 → 안전 교육 → 현장 투입 가능\". ㄱ: 대우로 \"현장 투입 불가 → 드론 자격증 없음\"(O). ㄷ: 전제3의 그 사람(드론 자격증이 있는 엔지니어)은 현장에 투입될 수 있으므로 현장 투입이 가능한 엔지니어가 있다(O). ㄴ: 안전 교육을 받았다고 드론 자격증이 있다는 보장은 없다(역).", "fig": false}, {"sec": "L", "stem": "다음 명제들이 모두 참이라고 할 때, 〈결론〉에 대한 판단으로 옳은 것은?", "body": "<div class=\"given\"><p>커피를 좋아하는 사람은 아침형 인간이다.<\/p><p>아침형 인간은 운동을 한다.<\/p><\/div><div class=\"given\"><p>A: 운동을 하지 않는 사람은 커피를 좋아하지 않는다.<\/p><p>B: 아침형 인간은 모두 커피를 좋아한다.<\/p><\/div>", "opts": ["B만 옳다.", "A만 옳다.", "A, B 모두 옳다.", "A, B 모두 그르다.", "A, B 모두 옳은지 그른지 판단할 수 없다."], "ans": 1, "exp": "전제를 이으면 \"커피를 좋아함 → 아침형 → 운동을 함\"이고, 대우는 \"운동 안 함 → 아침형 아님 → 커피 안 좋아함\". A는 이 대우이므로 옳다. B는 \"아침형 → 커피 좋아함\"으로 역에 해당해 참인지 알 수 없다.", "fig": false}, {"sec": "L", "stem": "7층 건물의 1층부터 7층까지 A~G 7개 부서가 한 층씩 쓴다. 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>C는 A보다 두 층 위에 있다.<\/p><p>B는 E보다 아래층에 있다.<\/p><p>D와 F는 바로 위아래로 붙어 있지 않다.<\/p><p>G는 1층 또는 7층에 있다.<\/p><p>E는 D의 바로 위층에 있다.<\/p><p>A는 1층에 있지 않다.<\/p><\/div>", "opts": ["A는 2층에서 일한다.", "G는 7층에서 일한다.", "C는 4층 이상에서 일한다.", "F는 1층에서 일하지 않는다.", "D는 5층에서 일한다."], "ans": 2, "exp": "D와 E는 붙어 있는 층(D 바로 위가 E)이고, C는 A보다 정확히 두 층 위다. A는 1층이 아니므로 C는 최소 4층이다. 가능한 배치는 8가지이며 G가 1층인 경우와 7층인 경우가 모두 있어 ②은 틀리다.", "fig": false}, {"sec": "L", "stem": "규정을 어긴 사람이 정확히 2명 있다. 다섯 명 중 한 명만 거짓을 말했을 때, 규정을 어긴 두 사람은?", "body": "<div class=\"given\"><p>A: B가 규정을 어겼다.<\/p><p>B: C는 규정을 어기지 않았다.<\/p><p>C: A와 D 중 적어도 한 명은 규정을 어겼다.<\/p><p>D: B의 말은 거짓이다.<\/p><p>E: 나와 A는 규정을 어기지 않았다.<\/p><\/div>", "opts": ["A, B", "B, D", "B, C", "A, D", "C, E"], "ans": 1, "exp": "B와 D는 진위가 반대이므로 둘 중 한 명이 거짓이고 A, C, E는 참이다. A에 의해 B가 포함되고, E에 의해 A와 E는 아니다. C(A 또는 D가 포함)가 참이므로 D가 포함된다. 그러면 B의 말(C는 아님)도 참이 되어 거짓말을 한 사람은 D다.", "fig": false}, {"sec": "L", "stem": "갑, 을, 병 세 사람의 차 색은 흰색, 검은색, 파란색으로 모두 다르고, 사는 도시도 서울, 부산, 광주로 모두 다르다. 다음 조건을 모두 만족할 때, 반드시 참인 것은?", "body": "<div class=\"given\"><p>갑의 차는 검은색이 아니다.<\/p><p>파란색 차의 주인은 부산에 산다.<\/p><p>을은 광주에 살지 않는다.<\/p><p>병의 차는 흰색이 아니다.<\/p><\/div>", "opts": ["을의 차는 파란색이다.", "갑의 차는 흰색이다.", "을은 서울에 산다.", "갑이 광주에 산다면 병은 부산에 산다.", "병이 부산에 살지 않는다면 병의 차는 검은색이다."], "ans": 4, "exp": "병의 차는 흰색이 아니므로 검은색이나 파란색이다. 파란색이면 파란 차의 주인은 부산에 살므로 병은 부산에 산다. 따라서 병이 부산에 살지 않으면 병의 차는 검은색이다. 가능한 경우는 네 가지이며, 갑이 광주에 살고 병이 서울에 사는 경우도 있어 ④은 틀리다.", "fig": false}, {"sec": "L", "stem": "승합차 좌석이 앞줄 3자리, 뒷줄 3자리로 되어 있고 뒷줄의 각 자리는 앞줄 같은 열의 바로 뒤이다. A~F 6명이 한 자리씩 앉을 때, 다음 조건을 모두 만족한다면 항상 참인 것은?", "body": "<div class=\"given\"><p>A와 B는 같은 줄에서 이웃하여 앉는다.<\/p><p>C와 D는 같은 열의 앞뒤 자리에 앉는다.<\/p><p>E는 뒷줄에 앉는다.<\/p><p>F는 가운데 열에 앉지 않는다.<\/p><p>A는 앞줄에 앉는다.<\/p><p>C는 오른쪽 열에 앉지 않는다.<\/p><\/div>", "opts": ["F는 B의 바로 뒤에 앉는다.", "A는 앞줄 가운데에 앉는다.", "C는 앞줄에 앉는다.", "E와 F는 이웃하여 앉는다.", "D는 뒷줄에 앉는다."], "ans": 3, "exp": "A와 B는 앞줄에서 이웃하고, C와 D는 같은 열의 앞뒤 자리다. C가 오른쪽 열이 아니고 A, B가 앞줄 두 자리를 쓰므로 C와 D는 왼쪽 열이다. 그러면 A, B는 앞줄 가운데와 오른쪽, E는 뒷줄이며 F는 가운데 열이 아니므로 E가 뒷줄 가운데, F가 뒷줄 오른쪽이다. A와 B, C와 D의 자리는 서로 바뀔 수 있다.", "fig": false}, {"sec": "L", "stem": "A~E 5개 팀이 성과 평가에서 1위부터 5위까지 순위를 받았다(동순위 없음). 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>A는 B보다 순위가 높다.<\/p><p>C는 D보다 순위가 낮다.<\/p><p>B와 E의 순위는 바로 이웃한다.<\/p><p>C는 1위도 5위도 아니다.<\/p><p>A는 1위가 아니다.<\/p><\/div>", "opts": ["E는 4위이다.", "C는 2위이다.", "B는 5위이다.", "A는 3위이다.", "D가 1위이다."], "ans": 4, "exp": "A는 1위가 아니고 B보다 순위가 높다. C는 1위도 5위도 아니고 D보다 순위가 낮다. B와 E는 순위가 붙어 있다. B와 E가 맨 아래 두 자리를 차지해야 A, C, D가 나머지에 들어갈 수 있고, A와 C 모두 1위가 될 수 없으므로 D가 1위다.", "fig": false}, {"sec": "L", "stem": "신제품 출시를 위해 6개 업무를 한 번에 하나씩 차례로 진행한다. 다음 조건을 모두 만족하는 진행 순서로 가능한 것은?", "body": "<div class=\"given\"><p>설계 → 시제품 → 양산 순서는 지켜야 한다(사이에 다른 업무가 끼어도 된다).<\/p><p>인증은 시제품보다 뒤에 한다.<\/p><p>원가 검토는 설계 바로 앞이나 바로 뒤에 하지 않는다.<\/p><p>교육은 맨 처음이나 맨 마지막에 한다.<\/p><p>인증은 맨 마지막에 하지 않는다.<\/p><\/div>", "opts": ["원가 → 교육 → 설계 → 시제품 → 인증 → 양산", "설계 → 원가 → 시제품 → 인증 → 양산 → 교육", "교육 → 설계 → 시제품 → 원가 → 인증 → 양산", "교육 → 원가 → 설계 → 시제품 → 인증 → 양산", "교육 → 설계 → 시제품 → 원가 → 양산 → 인증"], "ans": 2, "exp": "① 교육이 처음이나 마지막이 아니다. ② 원가 검토가 설계와 붙어 있다. ③ 모든 조건을 만족한다. ④ 원가 검토가 설계와 붙어 있다. ⑤ 인증이 마지막이다.", "fig": false}, {"sec": "L", "stem": "다음 글의 내용과 일치하는 것은?", "body": "<div class=\"passage\"><p>금속 표면에 다른 금속을 얇게 입히는 도금은 크게 전해 도금과 무전해 도금으로 나뉜다. 전해 도금은 도금할 부품을 음극에 연결하고 전류를 흘려, 용액 속 금속 이온이 부품 표면에서 전자를 얻어 금속으로 석출되게 한다. 속도가 빠르고 비용이 낮지만, 전류가 모서리와 튀어나온 부분에 몰리기 때문에 그곳은 두껍게, 오목한 곳은 얇게 입혀지는 단점이 있다.<\/p><p>무전해 도금은 전기 대신 용액 속 환원제가 금속 이온에 전자를 넘겨주는 화학 반응을 이용한다. 전류 분포의 영향을 받지 않으므로 복잡한 모양의 부품이나 구멍 안쪽까지 두께를 고르게 입힐 수 있다. 다만 반응 속도가 느리고, 도금이 진행되면서 환원제와 금속 이온이 소모되므로 농도와 온도를 계속 관리해야 한다.<\/p><\/div>", "opts": ["전해 도금은 전기를 쓰지 않고 화학 반응만으로 금속을 입힌다.", "무전해 도금은 전해 도금보다 도금 속도가 빠르다.", "전해 도금은 모서리보다 오목한 곳에 더 두껍게 입혀진다.", "무전해 도금은 복잡한 모양의 부품에도 두께를 고르게 입힐 수 있다.", "무전해 도금액은 한 번 만들면 관리하지 않아도 오래 쓸 수 있다."], "ans": 3, "exp": "무전해 도금은 전류 분포의 영향을 받지 않아 복잡한 모양에도 두께가 고르다고 했다. 전해 도금은 모서리에 두껍고 오목한 곳에 얇으며, 무전해 도금은 느리고 도금액 관리가 까다롭다.", "fig": false}, {"sec": "L", "stem": "다음 글의 내용과 일치하지 <u>않는<\/u> 것은?", "body": "<div class=\"passage\"><p>흔히 바이오 플라스틱이라고 부르는 것에는 서로 다른 두 종류가 섞여 있다. 하나는 사탕수수나 옥수수 같은 식물에서 원료를 얻은 플라스틱이고, 다른 하나는 미생물에 의해 분해되는 생분해성 플라스틱이다. 식물에서 원료를 얻었다고 해서 반드시 분해되는 것은 아니어서, 사탕수수로 만든 일부 플라스틱은 석유로 만든 것과 똑같이 분해되지 않는다.<\/p><p>대표적인 생분해성 플라스틱인 PLA도 아무 데서나 분해되지는 않는다. 58℃ 안팎의 온도와 적당한 습도가 유지되는 산업용 퇴비화 시설에서는 몇 달 안에 분해되지만, 바다나 땅속처럼 온도가 낮은 환경에서는 수년이 지나도 잘 분해되지 않는다. 또 일반 플라스틱과 함께 재활용 공정에 들어가면 재활용품의 품질을 떨어뜨릴 수 있어, 따로 모아 처리하는 체계가 필요하다.<\/p><\/div>", "opts": ["바이오 플라스틱에는 식물에서 원료를 얻는 것과 자연에서 분해되는 것이 섞여 있다.", "생분해성 플라스틱은 바다에 버려져도 몇 주 안에 모두 사라진다.", "PLA는 일정한 온도와 습도를 갖춘 시설에서 분해가 잘 된다.", "PLA를 일반 플라스틱과 섞어 재활용하면 재활용품의 품질이 떨어질 수 있다.", "식물 원료로 만든 플라스틱이라도 자연에서 분해되지 않을 수 있다."], "ans": 1, "exp": "글에서는 PLA가 바다나 땅속처럼 온도가 낮은 환경에서는 수년이 걸려도 잘 분해되지 않는다고 했다.", "fig": false}, {"sec": "L", "stem": "다음 글의 중심 내용으로 가장 적절한 것은?", "body": "<div class=\"passage\"><p>한 공장은 사고를 줄이기 위해 작업 중 사고를 보고한 부서에 감점을 주기로 했다. 그해 보고된 경미 사고는 절반으로 줄었다. 그러나 이듬해 큰 화재가 났고, 조사 결과 화재 직전 몇 달 동안 같은 설비에서 작은 불꽃과 과열이 여러 번 있었지만 아무도 보고하지 않았다는 사실이 드러났다.<\/p><p>큰 사고는 대개 수많은 작은 이상 징후 뒤에 온다. 작은 징후가 보고되어야 원인을 찾아 큰 사고를 막을 수 있다. 보고가 처벌로 이어지면 사람들은 숨기는 쪽을 택하고, 숫자는 좋아 보이지만 위험은 그대로 쌓인다. 사고 보고는 책임을 묻는 수단이 아니라 배우는 수단이어야 한다.<\/p><\/div>", "opts": ["사고 보고를 처벌과 연결하면 작은 사고가 숨겨져 큰 사고를 막을 기회를 잃게 된다.", "안전 수칙은 많을수록 사고를 줄인다.", "작은 사고는 큰 사고와 관계가 없다.", "사고 건수가 줄어든 것은 안전 관리가 잘되었다는 증거이다.", "사고를 낸 사람은 엄하게 처벌해야 재발을 막을 수 있다."], "ans": 0, "exp": "보고 건수 감소가 실제 사고 감소가 아니라 처벌을 피하려는 은폐 때문이었다는 사례를 들어, 보고와 처벌을 분리해야 한다고 말한다.", "fig": false}, {"sec": "L", "stem": "다음 글을 통해 추론할 수 있는 것으로 가장 적절한 것은?", "body": "<div class=\"passage\"><p>액체가 끓는다는 것은 액체 내부에서 기포가 생길 만큼 증기의 압력이 커졌다는 뜻이다. 그래서 끓는점은 액체를 누르는 바깥 압력에 따라 달라진다. 바깥 압력이 높으면 더 높은 온도가 되어야 끓고, 낮으면 더 낮은 온도에서 끓는다. 압력솥은 뚜껑을 밀폐해 내부 압력을 높여 물이 120℃ 가까이 되어서야 끓게 만든다. 반대로 식품이나 약품을 건조하는 공장에서는 압력을 낮춘 진공 상태에서 물을 낮은 온도로 증발시켜, 열에 약한 성분이 망가지지 않게 한다.<\/p><\/div>", "opts": ["물은 압력이 낮아지면 더 높은 온도에서 끓는다.", "진공 건조는 높은 온도가 필요한 공정이다.", "압력솥 안에서는 물이 100℃보다 낮은 온도에서 끓는다.", "끓는점은 물의 양에 따라 달라진다.", "높은 산에서는 물이 100℃보다 낮은 온도에서 끓어 음식이 잘 익지 않을 수 있다."], "ans": 4, "exp": "외부 압력이 낮으면 끓는점이 낮아진다고 했다. 기압이 낮은 높은 산에서는 물이 100℃ 전에 끓어 그 이상 온도가 오르지 않으므로 음식이 잘 익지 않을 수 있다. 압력솥은 반대로 압력을 높여 끓는점을 올린다.", "fig": false}, {"sec": "L", "stem": "다음 글을 바탕으로 할 때, 〈보기〉에 대한 설명으로 가장 적절한 것은?", "body": "<div class=\"passage\"><p>기업의 비용은 생산량과 관계없이 일정하게 드는 고정비와, 생산량에 따라 늘어나는 변동비로 나뉜다. 공장 설비의 감가상각비나 임대료는 고정비, 원재료비는 대표적인 변동비다. 고정비 비중이 높은 기업은 매출이 늘 때 추가로 드는 비용이 적어 이익이 매출보다 빠르게 늘지만, 매출이 줄 때도 고정비는 그대로 나가므로 이익이 매출보다 빠르게 줄어든다. 이를 영업 레버리지라고 한다.<\/p><\/div><div class=\"given\"><p>〈보기〉 A 기업은 대규모 설비를 갖춘 반도체 회사로 고정비 비중이 높고, B 기업은 외주 생산을 주로 하는 유통 회사로 변동비 비중이 높다.<\/p><\/div>", "opts": ["두 기업은 매출이 같은 비율로 변하면 이익도 같은 비율로 변한다.", "B 기업은 매출이 늘어도 이익이 거의 늘지 않는다.", "A 기업은 고정비 비중이 높아 매출이 줄면 이익이 더 크게 줄어든다.", "B 기업은 매출이 10% 줄어도 이익이 10%보다 적게 줄어든다.", "A 기업은 불황에 B 기업보다 이익이 덜 흔들린다."], "ans": 2, "exp": "고정비 비중이 높을수록 매출 변화에 따른 이익 변화가 커진다(영업 레버리지). A는 고정비 비중이 높으므로 매출이 줄면 이익이 더 크게 줄고, 불황에 더 크게 흔들린다. B도 고정비가 있으므로 매출이 10% 줄면 이익은 10%보다 많이 준다.", "fig": false}, {"sec": "L", "stem": "다음 글의 주장을 <u>약화<\/u>하는 것으로 가장 적절한 것은?", "body": "<div class=\"passage\"><p>우리 회사에서 사내 독서 모임에 참여하는 직원들의 업무 평가 점수는 참여하지 않는 직원들보다 평균 12점 높다. 책을 읽고 토론하는 과정에서 사고력과 소통 능력이 길러지기 때문이다. 따라서 독서 모임에 참여하면 업무 평가가 좋아진다.<\/p><\/div>", "opts": ["조사에 응한 독서 모임 회원들은 자발적으로 모임에 가입했다.", "독서 모임 회원 중 상당수가 업무 관련 서적을 주로 읽었다.", "독서 모임 회원들의 평균 근속 연수가 비회원보다 길었다.", "독서 모임은 매주 점심시간에 열렸다.", "독서 모임이 생기기 전부터 회원들의 업무 평가가 비회원보다 높았다."], "ans": 4, "exp": "주장은 \"독서 모임 참여 → 업무 평가 상승\"이다. 모임 이전부터 회원들의 평가가 높았다면, 원래 평가가 좋은 사람들이 모임에 들어온 것일 수 있어 인과 관계가 흔들린다. ①도 비슷한 방향이지만 평가 차이를 직접 설명하지는 못한다.", "fig": false}, {"sec": "L", "stem": "다음 글의 주장을 <u>강화<\/u>하는 것으로 가장 적절한 것은?", "body": "<div class=\"passage\"><p>공장의 소음이 작업 오류를 늘린다. 실제로 소음이 85dB을 넘는 구역에서 일하는 작업자의 오류율은 조용한 구역 작업자보다 두 배 가까이 높았다. 소음은 집중력을 흩뜨리고 동료와의 의사소통을 방해한다.<\/p><\/div>", "opts": ["같은 작업자에게 소음이 있는 날과 없는 날 같은 작업을 시켰더니, 소음이 있는 날 오류가 더 많았다.", "소음이 심한 공장에서 일하는 작업자는 귀마개 착용률이 높았다.", "소음이 심한 구역은 원래 작업 난도가 높은 구역이었다.", "소음 측정 장비의 오차가 컸다.", "작업자들은 소음보다 조명 문제를 더 크게 불평했다."], "ans": 0, "exp": "같은 사람, 같은 작업에서 소음 유무만 바꿨을 때 오류가 늘었다면 소음이 원인이라는 주장이 강해진다. ③는 다른 원인(작업 난도)을 보여 주어 오히려 약화한다.", "fig": false}, {"sec": "L", "stem": "다음 글의 빈칸에 들어갈 내용으로 가장 적절한 것은?", "body": "<div class=\"passage\"><p>무게가 정확히 100.0g인 추를 두 저울로 다섯 번씩 재었다. 저울 A는 102.1, 102.0, 102.2, 102.1, 102.0g을, 저울 B는 99.2, 100.9, 99.6, 100.5, 99.8g을 가리켰다. 저울 A의 값은 서로 매우 가깝지만 모두 2g가량 무겁게 나왔고, 저울 B의 값은 들쭉날쭉하지만 평균은 100.0g이다. 이처럼 ( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ). 저울 A처럼 일정한 방향으로 치우친 오차는 반복 측정으로는 줄어들지 않으므로 기준 추로 보정해야 한다.<\/p><\/div>", "opts": ["정밀도가 높으면 정확도도 반드시 높다", "측정을 여러 번 반복하면 계통 오차가 사라진다", "정확도와 정밀도는 같은 뜻이다", "측정값이 서로 가깝게 모여 있다고 해서 참값에 가깝다고 할 수는 없다", "저울 B가 저울 A보다 정확하다"], "ans": 3, "exp": "저울 A는 값이 고르게 모였지만(정밀) 참값에서 벗어나 있다(부정확). 이 예가 보여 주는 결론은 정밀도와 정확도가 다르다는 것이다. ②은 오히려 반대로, 반복으로는 일정하게 치우친 계통 오차가 없어지지 않는다.", "fig": false}, {"sec": "L", "stem": "다음 문단을 논리적 순서에 맞게 배열한 것은?", "body": "<div class=\"given\"><p>(가) 원인은 여름철 상수원에서 번식하는 남조류가 만들어 내는 지오스민이라는 물질이다.<\/p><p>(나) 여름이 되면 수돗물에서 흙냄새나 곰팡이 냄새가 난다는 민원이 늘어난다.<\/p><p>(다) 그래서 많은 정수장이 오존으로 물질을 분해한 뒤 활성탄으로 흡착하는 고도 정수 처리를 도입했다.<\/p><p>(라) 이 물질은 사람이 아주 적은 양에도 냄새를 느낄 만큼 예민하게 감지되며, 일반적인 응집과 침전, 염소 소독으로는 잘 제거되지 않는다.<\/p><\/div>", "opts": ["(나) – (라) – (가) – (다)", "(나) – (가) – (라) – (다)", "(가) – (나) – (라) – (다)", "(나) – (가) – (다) – (라)", "(라) – (나) – (가) – (다)"], "ans": 1, "exp": "현상 제시(나: 수돗물에서 냄새) → 원인(가: 조류가 만드는 물질) → \"이 물질은\" 특성과 기존 처리의 한계(라) → \"그래서\" 고도 정수 처리(다).", "fig": false}, {"sec": "L", "stem": "다음 글의 논지를 비판한 것으로 가장 적절한 것은?", "body": "<div class=\"passage\"><p>재택근무는 생산성을 떨어뜨린다. 우리 회사 관리자 120명에게 물어본 결과, 70%가 재택근무 이후 팀의 생산성이 낮아졌다고 답했다. 직원이 눈앞에 없으니 업무 진행 상황을 알기 어렵고, 그만큼 일이 늦어진다는 것이다. 따라서 재택근무를 축소하고 사무실 출근을 원칙으로 해야 한다.<\/p><\/div>", "opts": ["재택근무를 하면 출퇴근 시간이 줄어든다.", "재택근무를 하는 직원도 메신저로 소통할 수 있다.", "재택근무는 일부 직무에만 적용할 수 있다.", "재택근무 도입 후 사무실 임대료가 줄었다.", "설문에 응답한 관리자들은 원래 재택근무에 부정적이었을 수 있어, 관리자 설문만으로 생산성이 떨어졌다고 단정하기 어렵다."], "ans": 4, "exp": "글은 관리자 설문 하나를 근거로 생산성 저하를 결론 내린다. 설문 응답자의 관점이 치우쳤을 가능성을 지적하는 것이 근거 자체의 신뢰성을 겨냥한 비판이다. 나머지는 논지와 관계가 적거나 다른 쟁점이다.", "fig": false}], "rules": ""};
+const CIRC = ['①','②','③','④','⑤'];
+const SECS = DATA.secs, QS = DATA.qs.map((q,i)=>({...q,id:i}));
+const KEY = 'dcat-lang-A';
+const secQs = id => QS.filter(q=>q.sec===id);
+const fmt = s => { s=Math.max(0,Math.ceil(s)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); };
+const totalTime = SECS.reduce((a,s)=>a+s.time,0);
+
+let S = fresh();
+function fresh(){ return {phase:'intro', si:0, qi:0, ans:{}, deadline:null, used:{}, confirm:false, filter:'all'}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const t=localStorage.getItem(KEY); return t?JSON.parse(t):null; }catch(e){ return null; } }
+
+const app = document.getElementById('app'), bar = document.getElementById('bar');
+let tick = null;
+
+function render(){
+  clearInterval(tick); tick=null;
+  bar.hidden = S.phase!=='test';
+  if(S.phase==='intro') renderIntro();
+  else if(S.phase==='brief') renderBrief();
+  else if(S.phase==='test') renderTest();
+  else renderResult();
+  save();
+}
+
+function renderIntro(){
+  const prev = load();
+  const resumable = prev && (prev.phase==='test'||prev.phase==='brief');
+  const rows = SECS.map(s=>`<tr><td>${s.name}</td><td>${s.n}문항, ${fmt(s.time)}</td><td>${s.real}</td></tr>`).join('');
+  app.innerHTML = `<section class="sheet">
+    <div class="kicker">Doosan Comprehensive Aptitude Test, 연습용</div>
+    <h1>DCAT 언어논리 A</h1>
+    <p class="lede">언어논리 영역만 실제 시험과 같은 20문항, 20분으로 구성했습니다. 난이도는 실제 시험 수준을 목표로 했습니다.</p>
+    <div class="tbl-scroll"><table class="plan"><thead><tr><th>영역</th><th>이번 모의고사</th><th>실제 시험(응시 후기 기준)</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+    <ul class="rules">
+      <li>5지선다입니다. 고른 답을 다시 누르면 선택이 취소됩니다.</li>
+      <li>시간이 끝나면 그 영역은 자동 제출되고 다음 영역 안내로 넘어갑니다.</li>
+      <li>오답 감점이 있다는 응시 후기가 많습니다. 확신이 없으면 비워 두는 연습도 해 보세요.</li>
+      <li>공간추리, 도형추리는 실제로 메모가 금지되니 종이 없이 푸는 것을 권합니다.</li>
+      <li>실제 문항 수와 시간은 회차마다 바뀔 수 있습니다.</li>
+    </ul>
+    <div class="row">
+      <button class="btn primary" id="go">첫 영역 안내 보기</button>
+      ${resumable?'<button class="btn" id="resume">이어서 풀기</button>':''}
+    </div></section>`;
+  document.getElementById('go').onclick=()=>{ S=fresh(); S.phase='brief'; render(); window.scrollTo(0,0); };
+  if(resumable) document.getElementById('resume').onclick=()=>{ S=prev; render(); };
+}
+
+function renderBrief(){
+  const s = SECS[S.si];
+  const timedOut = S.si>0 && S.lastTimeout;
+  app.innerHTML = `<section class="sheet">
+    ${timedOut?`<p class="pill skip" style="margin:0 0 10px">이전 영역 시간 종료로 자동 제출됨</p>`:''}
+    <div class="kicker">영역 ${S.si+1} / ${SECS.length}</div>
+    <h1>${s.name}</h1>
+    <div class="brief-meta"><div><b>${s.n}</b><span>문항</span></div><div><b>${fmt(s.time)}</b><span>제한시간</span></div><div><b>${Math.round(s.time/s.n)}초</b><span>문항당 평균</span></div></div>
+    <p class="lede">${s.desc}</p>
+    ${s.example||''}
+    <p class="tip">${s.tip}</p>
+    <button class="btn primary" id="start">시작하기, 타이머가 바로 시작됩니다</button></section>`;
+  document.getElementById('start').onclick=()=>{
+    S.phase='test'; S.qi=0; S.confirm=false; S.deadline=Date.now()+s.time*1000; S.lastTimeout=false; render(); window.scrollTo(0,0);
+  };
+}
+
+function optHTML(q, i, extra){
+  return `<button class="opt ${extra||''}" data-i="${i}" aria-pressed="${S.ans[q.id]===i}"><span class="cn">${CIRC[i]}</span><span class="ot">${q.opts[i]}</span></button>`;
+}
+
+function renderTest(){
+  const s = SECS[S.si], qs = secQs(s.id), q = qs[S.qi];
+  const unanswered = qs.filter(x=>S.ans[x.id]===undefined).length;
+  bar.innerHTML = `<div class="bar-in"><span class="sec">${s.name}</span><span class="step">${S.qi+1} / ${qs.length}, 미응답 ${unanswered}</span><span class="grow"></span><span class="timer" id="tm">--:--</span></div>`;
+  app.innerHTML = `<section class="sheet">
+    <div class="qhead"><span class="qno">${String(S.qi+1).padStart(2,'0')}</span><div class="stem">${q.stem}</div></div>
+    ${q.body?`<div class="body">${q.body}</div>`:''}
+    <div class="opts ${q.fig?'fig':''}">${q.opts.map((_,i)=>optHTML(q,i)).join('')}</div>
+    <div class="nav">
+      <div class="row"><button class="btn" id="prev" ${S.qi===0?'disabled':''}>이전</button><button class="btn" id="next" ${S.qi===qs.length-1?'disabled':''}>다음</button></div>
+      <button class="btn ${S.si===SECS.length-1?'primary':''}" id="end">${S.si===SECS.length-1?'시험 제출':'영역 종료'}</button>
+    </div>
+    ${S.confirm?`<div class="confirm"><p>${unanswered?`미응답 ${unanswered}문항이 남았습니다. `:''}종료하면 이 영역으로 돌아올 수 없습니다.</p><div class="row"><button class="btn" id="cancel">계속 풀기</button><button class="btn primary" id="doend">종료하고 넘어가기</button></div></div>`:''}
+    <div class="pal" aria-label="문항 이동">${qs.map((x,i)=>`<button class="chip ${S.ans[x.id]!==undefined?'done':''} ${i===S.qi?'cur':''}" data-q="${i}" aria-label="${i+1}번 문항">${i+1}</button>`).join('')}</div>
+  </section>`;
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; if(S.ans[q.id]===i) delete S.ans[q.id]; else S.ans[q.id]=i; render(); });
+  app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ S.qi=+b.dataset.q; S.confirm=false; render(); window.scrollTo(0,0); });
+  const go = d=>{ S.qi+=d; S.confirm=false; render(); window.scrollTo(0,0); };
+  document.getElementById('prev').onclick=()=>go(-1);
+  document.getElementById('next').onclick=()=>go(1);
+  document.getElementById('end').onclick=()=>{ S.confirm=true; render(); };
+  if(S.confirm){ document.getElementById('cancel').onclick=()=>{S.confirm=false;render();}; document.getElementById('doend').onclick=()=>endSection(false); }
+  const tm=document.getElementById('tm');
+  const upd=()=>{ const left=(S.deadline-Date.now())/1000; tm.textContent=fmt(left); tm.classList.toggle('low',left<=60); tm.classList.toggle('blink',left<=10);
+    if(left<=0) endSection(true); };
+  upd(); tick=setInterval(upd,250);
+}
+
+function endSection(timeout){
+  const s = SECS[S.si];
+  S.used[s.id] = Math.min(s.time, Math.round(s.time - Math.max(0,(S.deadline-Date.now())/1000)));
+  S.confirm=false; S.deadline=null;
+  if(S.si===SECS.length-1){ S.phase='result'; }
+  else { S.si++; S.phase='brief'; S.lastTimeout=timeout; }
+  render(); window.scrollTo(0,0);
+}
+
+function stat(id){
+  const qs=secQs(id); let ok=0,bad=0,skip=0;
+  qs.forEach(q=>{ const a=S.ans[q.id]; if(a===undefined) skip++; else if(a===q.ans) ok++; else bad++; });
+  return {n:qs.length,ok,bad,skip};
+}
+
+function renderResult(){
+  const st = SECS.map(s=>({s,...stat(s.id)}));
+  const ok = st.reduce((a,x)=>a+x.ok,0), bad=st.reduce((a,x)=>a+x.bad,0), skip=st.reduce((a,x)=>a+x.skip,0);
+  const rows = st.map(x=>`<tr><td>${x.s.name}</td><td>${x.ok} / ${x.n}</td><td>${x.bad}</td><td>${x.skip}</td><td>${fmt(S.used[x.s.id]??0)} / ${fmt(x.s.time)}</td><td><div class="meter"><i style="width:${Math.round(x.ok/x.n*100)}%"></i></div></td></tr>`).join('');
+  const f = S.filter;
+  let review='';
+  SECS.forEach(s=>{
+    const items = secQs(s.id).map((q,i)=>{
+      const a=S.ans[q.id], state=a===undefined?'skip':(a===q.ans?'ok':'bad');
+      if(f==='wrong' && state==='ok') return '';
+      const label={ok:'정답',bad:'오답',skip:'미응답'}[state];
+      const opts=q.opts.map((o,k)=>`<div class="opt ${k===q.ans?'is-ans':''} ${k===a&&a!==q.ans?'is-wrong':''}"><span class="cn">${CIRC[k]}</span><span class="ot">${o}</span></div>`).join('');
+      return `<article class="rv"><div class="rv-h"><span class="qno">${String(i+1).padStart(2,'0')}</span><span class="pill ${state}">${label}</span><span class="note" style="margin:0">정답 ${CIRC[q.ans]}${a!==undefined&&a!==q.ans?`, 내 답 ${CIRC[a]}`:''}</span></div>
+        <div class="stem">${q.stem}</div>
+        ${q.body?`<details><summary>문제 자료 보기</summary><div class="body" style="margin-top:8px">${q.body}</div></details>`:''}
+        <div class="opts ${q.fig?'fig':''}">${opts}</div>
+        <div class="exp"><b>해설</b> ${q.exp}</div></article>`;
+    }).join('');
+    if(items.trim()) review += `<h2 class="sec-title">${s.name}</h2>${items}`;
+  });
+  if(!review) review='<p class="note">틀리거나 비운 문항이 없습니다.</p>';
+  app.innerHTML = `<section class="sheet">
+    <div class="kicker">채점 결과</div>
+    <h1>DCAT 언어논리 A</h1>
+    <div class="score"><b>${ok}</b><span>/ ${QS.length} 정답, 오답 ${bad}, 미응답 ${skip}</span></div>
+    <div class="tbl-scroll"><table class="plan"><thead><tr><th>영역</th><th>정답</th><th>오답</th><th>미응답</th><th>사용 시간</th><th>정답률</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="row"><button class="btn" id="again">처음부터 다시 풀기</button></div>
+    <div class="filter" role="group" aria-label="해설 보기 범위"><button data-f="all" aria-pressed="${f==='all'}">전체 해설</button><button data-f="wrong" aria-pressed="${f==='wrong'}">틀리거나 비운 문항만</button></div>
+    ${review}
+  </section>`;
+  document.getElementById('again').onclick=()=>{ S=fresh(); render(); window.scrollTo(0,0); };
+  app.querySelectorAll('.filter button').forEach(b=>b.onclick=()=>{ S.filter=b.dataset.f; render(); });
+}
+
+function start(data){
+  if(data && data.S) S=data.S;
+  window.claude?.hot?.snapshot?.(()=>({S}));
+  render();
+}
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+<script src="export.js"></script>
+</body></html>
