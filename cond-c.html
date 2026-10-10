@@ -1,0 +1,351 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:9;background:#28498a;color:#fff;font:600 13px system-ui,sans-serif;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2)">← 목록</a>
+<title>DCAT 조건 추리 C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a CBT exam console. Sticky status bar (section, count, timer), one question per screen on a white answer sheet, numbered palette below. */
+:root{
+  --ground:#eef0f3; --sheet:#ffffff; --ink:#18212c; --muted:#5d6876; --line:#d5dae1; --soft:#f4f6f8;
+  --accent:#28498a; --accent-ink:#ffffff; --accent-soft:#e6ecf7;
+  --warn:#b4410f; --ok:#1d7a4c; --ok-soft:#e3f2ea; --bad:#b42f2f; --bad-soft:#f8e4e4;
+  --cube-top:#f1f3f6; --cube-fx:#c3cad4; --cube-fy:#8e98a6; --fig-line:#1e2731; --fig-on:#38424f; --fig-off:#ffffff;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#0f141a; --sheet:#171e26; --ink:#e4e9ef; --muted:#9aa5b2; --line:#2b3542; --soft:#1d2530;
+  --accent:#8fb0f0; --accent-ink:#0f1a2e; --accent-soft:#22314a;
+  --warn:#f08a5d; --ok:#5fcf98; --ok-soft:#173327; --bad:#f08080; --bad-soft:#3a1d1f;
+  --cube-top:#3a4553; --cube-fx:#2a333f; --cube-fy:#1c232c; --fig-line:#c9d2dd; --fig-on:#c9d2dd; --fig-off:#171e26;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#0f141a; --sheet:#171e26; --ink:#e4e9ef; --muted:#9aa5b2; --line:#2b3542; --soft:#1d2530;
+  --accent:#8fb0f0; --accent-ink:#0f1a2e; --accent-soft:#22314a;
+  --warn:#f08a5d; --ok:#5fcf98; --ok-soft:#173327; --bad:#f08080; --bad-soft:#3a1d1f;
+  --cube-top:#3a4553; --cube-fx:#2a333f; --cube-fy:#1c232c; --fig-line:#c9d2dd; --fig-on:#c9d2dd; --fig-off:#171e26;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+
+/* status bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sheet);border-bottom:1px solid var(--line)}
+.bar-in{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar .sec{font-weight:700}
+.bar .step{color:var(--muted);font-size:13px}
+.bar .grow{flex:1}
+.timer{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;letter-spacing:.02em;padding:2px 10px;border-radius:6px;background:var(--soft)}
+.timer.low{color:var(--warn)}
+.timer.blink{animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.timer.blink{animation:none}}
+
+/* sheet */
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:clamp(16px,4vw,28px)}
+h1{font-size:clamp(22px,4vw,28px);line-height:1.3;margin:0 0 6px;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:18px;margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 18px;max-width:62ch}
+.kicker{font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;font-weight:600}
+.btn{border:1px solid var(--line);background:var(--sheet);border-radius:8px;padding:9px 16px;font-weight:600}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+table.plan{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin:6px 0 14px}
+table.plan th,table.plan td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}
+table.plan thead th{font-size:12px;color:var(--muted);font-weight:600}
+table.plan tfoot td{font-weight:700;border-bottom:none}
+.tbl-scroll{overflow-x:auto}
+ul.rules{margin:0 0 18px;padding-left:18px;max-width:66ch}
+ul.rules li{margin-bottom:4px}
+
+/* question */
+.qhead{display:flex;gap:10px;align-items:baseline;margin-bottom:12px}
+.qno{font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:18px;flex:none}
+.stem{font-weight:600;font-size:16px;line-height:1.55;min-width:0}
+.body{margin:0 0 16px;min-width:0}
+.given{border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--soft);margin:0 0 10px}
+.given p{margin:2px 0}
+.passage{border-left:3px solid var(--line);padding-left:14px;margin:0 0 10px}
+.passage p{margin:0 0 8px;max-width:68ch;text-align:justify;word-break:keep-all}
+.outline{border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.outline p{margin:2px 0}.outline .ol-title{font-weight:700;margin-bottom:6px}.outline .ol2{padding-left:1.4em}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.tbl-wrap{overflow-x:auto;margin:0 0 10px}
+table.data{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;min-width:100%}
+table.data caption{text-align:left;font-weight:600;padding-bottom:6px;caption-side:top}
+table.data .unit{float:right;font-weight:400;color:var(--muted);font-size:12px}
+table.data th,table.data td{border:1px solid var(--line);padding:6px 10px;text-align:right;white-space:nowrap}
+table.data thead th{background:var(--soft);text-align:center}
+table.data tbody th{text-align:center;background:var(--soft);font-weight:600}
+.chart-fig{margin:0 0 10px}.chart-fig figcaption{font-weight:600;margin-bottom:6px}
+.chart-scroll{overflow-x:auto}
+.legend{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0 0}
+.lg-bar{display:inline-block;width:12px;height:10px;background:var(--cube-fx);border:1px solid var(--fig-line)}
+.lg-line{display:inline-block;width:16px;height:2px;background:var(--accent);margin-left:8px}
+
+/* figures */
+svg.fig{max-width:100%;height:auto;display:block}
+.c-top{fill:var(--cube-top);stroke:var(--fig-line);stroke-width:1.1;stroke-linejoin:round}
+.c-fx{fill:var(--cube-fx);stroke:var(--fig-line);stroke-width:1.1;stroke-linejoin:round}
+.c-fy{fill:var(--cube-fy);stroke:var(--fig-line);stroke-width:1.1;stroke-linejoin:round}
+.v-on{fill:var(--cube-fx);stroke:var(--fig-line);stroke-width:1.2}
+.hm-on{fill:var(--cube-top);stroke:var(--fig-line);stroke-width:1.2}
+.hm-off{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:3 3}
+.hm-n{fill:var(--ink);font:600 15px var(--f-mono)}
+.lbl{fill:var(--accent);font:600 12px var(--f-body)}
+.arw{stroke:var(--accent);stroke-width:2}.arh{fill:var(--accent)}
+.n-face{fill:var(--cube-top);stroke:var(--fig-line);stroke-width:1.3}
+.s-solid{fill:var(--fig-on)}.s-ink{fill:var(--fig-line)}
+.s-line{fill:none;stroke:var(--fig-line);stroke-width:2}
+.s-stroke{stroke:var(--fig-line);stroke-width:2.4;stroke-linecap:round}
+.g-on{fill:var(--fig-on);stroke:var(--fig-line);stroke-width:1}
+.g-off{fill:var(--fig-off);stroke:var(--fig-line);stroke-width:1}
+.mk-on{fill:var(--fig-off);stroke:var(--fig-off);stroke-width:1}
+.mk-off{fill:none;stroke:var(--fig-line);stroke-width:1.8}
+.op{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linejoin:round}
+.ch-grid{stroke:var(--line);stroke-width:1}.ch-zero{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3}
+.ch-ax{fill:var(--muted);font:12px var(--f-body)}
+.ch-bar{fill:var(--cube-fx);stroke:var(--fig-line);stroke-width:1}
+.ch-val{fill:var(--ink);font:600 12px var(--f-mono)}
+.ch-line{fill:none;stroke:var(--accent);stroke-width:2}
+.ch-pt{fill:var(--sheet);stroke:var(--accent);stroke-width:2}
+.ch-pv{fill:var(--accent);font:600 11px var(--f-mono);paint-order:stroke;stroke:var(--sheet);stroke-width:3px;stroke-linejoin:round}
+.vrow{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end}
+.vw{margin:0}.vw figcaption,.lab figcaption{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+.lab{margin:0}
+.ops{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 12px;border:1px dashed var(--line);border-radius:8px;margin-bottom:12px;font-size:13px}
+.op-item{display:inline-flex;align-items:center;gap:6px}
+.opi{display:inline-block;vertical-align:middle;flex:none}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.arrow{color:var(--muted);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.qbox{display:inline-grid;place-items:center;width:66px;height:66px;border:1.5px dashed var(--muted);border-radius:4px;font-weight:700;color:var(--muted);font-size:20px}
+.seq{display:inline-flex;gap:4px;padding:2px}
+
+/* options */
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);line-height:1.55}
+.opt:hover{background:var(--soft)}
+.opt .cn{font-weight:700;color:var(--muted);flex:none;width:1.4em}
+.opt .ot{min-width:0}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt[aria-pressed="true"] .cn{color:var(--accent)}
+.opts.fig{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+.opts.fig .opt{flex-direction:column;align-items:center;padding:8px 8px 12px}
+.opts.fig .opt .cn{align-self:flex-start}
+.opts.fig .opt svg{max-height:160px;width:auto}
+.body svg.iso{max-width:min(100%,340px)}
+
+/* palette & nav */
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+.pal{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.chip{width:36px;height:36px;border-radius:6px;border:1px solid var(--line);background:var(--sheet);font-family:var(--f-mono);font-weight:600;font-variant-numeric:tabular-nums}
+.chip.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.chip.cur{box-shadow:0 0 0 2px var(--accent)}
+.confirm{margin-top:14px;border:1px solid var(--warn);border-radius:8px;padding:12px 14px}
+.confirm p{margin:0 0 10px}
+
+/* briefing */
+.brief-meta{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 14px;font-variant-numeric:tabular-nums}
+.brief-meta b{font-family:var(--f-mono);font-size:22px;display:block;line-height:1.2}
+.brief-meta span{font-size:12px;color:var(--muted)}
+.tip{background:var(--soft);border-radius:8px;padding:10px 14px;margin:0 0 16px;max-width:70ch}
+
+/* results */
+.score{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:6px 0 18px}
+.score b{font-family:var(--f-mono);font-size:44px;line-height:1}
+.score span{color:var(--muted)}
+.meter{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;min-width:80px}
+.meter i{display:block;height:100%;background:var(--accent)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.skip{background:var(--soft);color:var(--muted)}
+.rv{border-top:1px solid var(--line);padding-block:16px}
+.rv-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}
+.rv details{margin:6px 0 10px}
+.rv summary{cursor:pointer;color:var(--accent);font-size:13px;font-weight:600}
+.rv .opt{cursor:default}
+.rv .opt.is-ans{border-color:var(--ok);background:var(--ok-soft)}
+.rv .opt.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.exp{background:var(--soft);border-radius:8px;padding:10px 14px;margin-top:10px;max-width:72ch}
+.exp b{color:var(--accent)}
+.filter{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 4px}
+.filter button{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:4px 12px;font-size:13px}
+.filter button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sec-title{margin-top:26px}
+.pair{display:inline-flex;gap:10px;align-items:flex-end}.pc{display:inline-flex;flex-direction:column;align-items:center;gap:2px}.pc small{font-size:11px;color:var(--muted)}
+.opn{font-size:14px}
+.example{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:0 0 14px}
+.example .ex-h{margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--accent)}
+.example p{margin:0 0 8px}
+.ex-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 10px}
+.example svg.iso{max-width:min(100%,260px)}
+</style>
+
+<div id="bar" class="bar" hidden></div>
+<main class="wrap" id="app"></main>
+
+<script>
+const DATA = {"secs": [{"id": "C", "name": "조건 추리", "time": 900, "real": "언어논리 중 일부", "n": 15, "desc": "순서 배치, 층 배치, 요일 배치, 원탁, 속성 대응, 진실과 거짓, 조건을 하나 더해 확정하기.", "tip": "문항당 1분입니다. 가장 많이 확정되는 조건(고정 위치, 바로 다음)부터 놓고, 나머지는 경우를 나눠 표로 정리하세요. 보기를 하나씩 대입해 반례를 찾는 것도 빠른 방법입니다."}], "qs": [{"sec": "C", "stem": "A, B, C, D, E, F 6명이 한 명씩 차례로 발표한다. 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>E는 A보다 먼저 발표한다.</p><p>D는 5번째로 발표하지 않는다.</p><p>A와 B 사이에 정확히 4명이 발표한다.</p><p>B와 E는 연달아 발표한다.</p></div>", "opts": ["D와 E는 연달아 발표하지 않는다.", "A와 C는 연달아 발표하지 않는다.", "D와 F 사이에 정확히 4명이 발표한다.", "C와 E 사이에 정확히 2명이 발표한다.", "D는 A보다 먼저 발표한다."], "ans": 4, "exp": "가능한 경우는 4가지다. B – E – C – D – F – A / B – E – D – C – F – A / B – E – D – F – C – A / B – E – F – D – C – A. ①은 B – E – D – C – F – A일 때 틀린다. ②는 B – E – D – F – C – A일 때 틀린다. ③은 B – E – C – D – F – A일 때 틀린다. ④는 B – E – C – D – F – A일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "갑, 을, 병 3명은 기획팀, 개발팀, 영업팀에 한 명씩 배치되었고, 출신 지역은 서울, 대구, 인천으로 모두 다르다. 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>병은 개발팀이다.</p><p>기획팀 직원은 대구 출신이다.</p><p>을은 서울 출신이 아니다.</p></div>", "opts": ["을이 영업팀이라면 을은 대구 출신이다.", "영업팀 직원은 대구 출신이다.", "을이 영업팀이라면 을은 인천 출신이다.", "병이 개발팀이라면 병은 서울 출신이다.", "개발팀 직원은 서울 출신이다."], "ans": 2, "exp": "가능한 경우는 3가지다. 갑(기획팀, 대구), 을(영업팀, 인천), 병(개발팀, 서울) / 갑(영업팀, 서울), 을(기획팀, 대구), 병(개발팀, 인천) / 갑(영업팀, 인천), 을(기획팀, 대구), 병(개발팀, 서울). ①은 갑(기획팀, 대구), 을(영업팀, 인천), 병(개발팀, 서울)일 때 틀린다. ②는 갑(기획팀, 대구), 을(영업팀, 인천), 병(개발팀, 서울)일 때 틀린다. ④는 갑(영업팀, 서울), 을(기획팀, 대구), 병(개발팀, 인천)일 때 틀린다. ⑤는 갑(영업팀, 서울), 을(기획팀, 대구), 병(개발팀, 인천)일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "회의실 장비가 파손되었고, 파손한 사람은 한 명이다. 5명 중 한 명만 거짓을 말했다. 파손한 사람은?", "body": "<div class=\"given\"><p>A: C가 범인이다.</p><p>B: E가 범인이다.</p><p>C: A와 E 중 한 명이 범인이다.</p><p>D: B의 말은 참이다.</p><p>E: D의 말은 참이다.</p></div>", "opts": ["A", "B", "C", "D", "E"], "ans": 4, "exp": "범인을 한 명씩 가정해 본다. 범인이 A라면 거짓을 말한 사람이 4명이 되어 조건에 맞지 않는다. 범인이 B라면 거짓을 말한 사람이 5명이 되어 조건에 맞지 않는다. 범인이 C라면 거짓을 말한 사람이 4명이 되어 조건에 맞지 않는다. 범인이 D라면 거짓을 말한 사람이 5명이 되어 조건에 맞지 않는다. 범인이 E일 때만 거짓을 말한 사람이 A로 정확히 1명이 된다. 먼저 서로 모순되는 진술 쌍(한쪽이 참이면 다른 쪽이 거짓)을 찾으면 경우를 빨리 줄일 수 있다.", "fig": false}, {"sec": "C", "stem": "6층 건물에 A, B, C, D, E, F 6개 팀이 한 층씩 쓴다. 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>C와 F는 바로 위아래로 붙어 있다.</p><p>F는 A보다 아래층에 있다.</p><p>B는 5층에 있다.</p><p>A와 D 사이에 정확히 4개 층이 있다.</p></div>", "opts": ["D는 B보다 아래층에 있다.", "D와 F 사이에 정확히 1개 층이 있다.", "D와 E는 바로 위아래로 붙어 있지 않다.", "F는 C보다 아래층에 있다.", "B와 D 사이에 정확히 4개 층이 있다."], "ans": 0, "exp": "가능한 경우는 4가지다. 1층 D – 2층 C – 3층 F – 4층 E – 5층 B – 6층 A / 1층 D – 2층 E – 3층 C – 4층 F – 5층 B – 6층 A / 1층 D – 2층 F – 3층 C – 4층 E – 5층 B – 6층 A / 1층 D – 2층 E – 3층 F – 4층 C – 5층 B – 6층 A. ②는 1층 D – 2층 E – 3층 C – 4층 F – 5층 B – 6층 A일 때 틀린다. ③은 1층 D – 2층 E – 3층 C – 4층 F – 5층 B – 6층 A일 때 틀린다. ④는 1층 D – 2층 C – 3층 F – 4층 E – 5층 B – 6층 A일 때 틀린다. ⑤는 1층 D – 2층 C – 3층 F – 4층 E – 5층 B – 6층 A일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "A, B, C, D, E, F 6명이 원탁에 같은 간격으로 앉는다. 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>B와 E는 이웃하여 앉지 않는다.</p><p>C는 E의 바로 시계 방향 옆자리에 앉는다.</p><p>D는 C의 바로 시계 방향 옆자리에 앉는다.</p></div>", "opts": ["B와 C는 이웃하여 앉지 않는다.", "B와 F는 서로 마주 보고 앉는다.", "B와 C는 서로 마주 보고 앉는다.", "D와 F는 서로 마주 보고 앉는다.", "A와 F는 이웃하여 앉는다."], "ans": 0, "exp": "A의 자리를 기준으로 놓고 따지면 가능한 배치는 4가지다(시계 방향으로 A B F E C D, 시계 방향으로 A E C D B F, 시계 방향으로 A E C D F B, 시계 방향으로 A F E C D B). ②는 시계 방향으로 A B F E C D일 때 틀린다. ③은 시계 방향으로 A E C D B F일 때 틀린다. ④는 시계 방향으로 A E C D B F일 때 틀린다. ⑤는 시계 방향으로 A B F E C D일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "A, B, C, D, E 5명이 한 명씩 차례로 발표한다. 다음 조건에 하나를 더하여 전체 배치가 하나로 확정되도록 할 때, 추가할 조건으로 알맞은 것은?", "body": "<div class=\"given\"><p>C는 5번째로 발표하지 않는다.</p><p>C와 E 사이에 정확히 1명이 발표한다.</p><p>B와 C는 연달아 발표하지 않는다.</p></div>", "opts": ["B와 D 사이에 정확히 3명이 발표한다.", "C는 E보다 먼저 발표한다.", "D는 B보다 먼저 발표한다.", "E는 처음이나 마지막으로 발표하지 않는다.", "C와 D 사이에 정확히 2명이 발표한다."], "ans": 4, "exp": "주어진 조건만으로는 12가지 배치가 가능하다. ①을 추가하면 2가지가 남는다. ②를 추가하면 8가지가 남는다. ③을 추가하면 7가지가 남는다. ④를 추가하면 8가지가 남는다. ⑤를 추가하면 1가지(C – A – E – D – B)로 확정된다.", "fig": false}, {"sec": "C", "stem": "A, B, C, D, E, F 6명이 월요일부터 하루에 한 명씩 차례로 당직을 선다. 다음 조건을 모두 만족할 때, 반드시 거짓인 것은?", "body": "<div class=\"given\"><p>C와 F는 연이은 날에 당직을 서지 않는다.</p><p>D는 화요일에 당직을 선다.</p><p>F는 A보다 먼저 당직을 선다.</p><p>B는 D보다 먼저 당직을 선다.</p></div>", "opts": ["A는 B보다 먼저 당직을 선다.", "F는 E가 당직을 선 바로 다음 날 당직을 선다.", "D는 F보다 먼저 당직을 선다.", "A와 F 사이에 정확히 2명이 당직을 선다.", "A는 C보다 먼저 당직을 선다."], "ans": 0, "exp": "가능한 경우는 6가지다. 월 B – 화 D – 수 F – 목 A – 금 C – 토 E / 월 B – 화 D – 수 F – 목 A – 금 E – 토 C / 월 B – 화 D – 수 E – 목 F – 금 A – 토 C / 월 B – 화 D – 수 F – 목 E – 금 A – 토 C / 월 B – 화 D – 수 C – 목 E – 금 F – 토 A / 월 B – 화 D – 수 F – 목 E – 금 C – 토 A. ②는 월 B – 화 D – 수 E – 목 F – 금 A – 토 C일 때 성립한다. ③은 월 B – 화 D – 수 F – 목 A – 금 C – 토 E일 때 성립한다. ④는 월 B – 화 D – 수 F – 목 E – 금 C – 토 A일 때 성립한다. ⑤는 월 B – 화 D – 수 F – 목 A – 금 C – 토 E일 때 성립한다.", "fig": false}, {"sec": "C", "stem": "갑, 을, 병, 정 4명은 기획팀, 개발팀, 생산팀, 영업팀에 한 명씩 배치되었고, 출신 지역은 서울, 부산, 대구, 광주로 모두 다르다. 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>병은 서울 출신이 아니다.</p><p>을은 영업팀이다.</p><p>병은 광주 출신이 아니다.</p><p>병은 생산팀이 아니다.</p><p>을은 부산 출신이다.</p><p>갑은 기획팀이다.</p></div>", "opts": ["정은 광주 출신이다.", "정은 서울 출신이다.", "정이 생산팀이라면 정은 광주 출신이다.", "병은 대구 출신이다.", "영업팀 직원은 대구 출신이다."], "ans": 3, "exp": "가능한 경우는 2가지다. 갑(기획팀, 서울), 을(영업팀, 부산), 병(개발팀, 대구), 정(생산팀, 광주) / 갑(기획팀, 광주), 을(영업팀, 부산), 병(개발팀, 대구), 정(생산팀, 서울). ①은 갑(기획팀, 광주), 을(영업팀, 부산), 병(개발팀, 대구), 정(생산팀, 서울)일 때 틀린다. ②는 갑(기획팀, 서울), 을(영업팀, 부산), 병(개발팀, 대구), 정(생산팀, 광주)일 때 틀린다. ③은 갑(기획팀, 광주), 을(영업팀, 부산), 병(개발팀, 대구), 정(생산팀, 서울)일 때 틀린다. ⑤는 갑(기획팀, 서울), 을(영업팀, 부산), 병(개발팀, 대구), 정(생산팀, 광주)일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "회의실 장비가 파손되었고, 파손한 사람은 한 명이다. 5명 중 정확히 2명이 거짓을 말했다. 파손한 사람은?", "body": "<div class=\"given\"><p>A: A가 범인이다.</p><p>B: C는 범인이 아니다.</p><p>C: B의 말은 참이다.</p><p>D: C의 말은 거짓이다.</p><p>E: A와 B 중 한 명이 범인이다.</p></div>", "opts": ["A", "B", "C", "D", "E"], "ans": 1, "exp": "범인을 한 명씩 가정해 본다. 범인이 A라면 거짓을 말한 사람이 1명이 되어 조건에 맞지 않는다. 범인이 C라면 거짓을 말한 사람이 4명이 되어 조건에 맞지 않는다. 범인이 D라면 거짓을 말한 사람이 3명이 되어 조건에 맞지 않는다. 범인이 E라면 거짓을 말한 사람이 3명이 되어 조건에 맞지 않는다. 범인이 B일 때만 거짓을 말한 사람이 A, D로 정확히 2명이 된다. 먼저 서로 모순되는 진술 쌍(한쪽이 참이면 다른 쪽이 거짓)을 찾으면 경우를 빨리 줄일 수 있다.", "fig": false}, {"sec": "C", "stem": "A, B, C, D, E, F, G 7명이 한 명씩 차례로 발표한다. 다음 조건을 모두 만족할 때, 반드시 참인 것은?", "body": "<div class=\"given\"><p>A는 7번째로 발표한다.</p><p>A와 G 사이에 정확히 5명이 발표한다.</p><p>F는 2번째로 발표한다.</p><p>B는 C 바로 다음에 발표한다.</p><p>B는 6번째로 발표하지 않는다.</p></div>", "opts": ["C와 F 사이에 정확히 2명이 발표한다.", "D는 6번째로 발표한다.", "C는 D 바로 다음에 발표한다.", "A와 C는 연달아 발표하지 않는다.", "A와 B 사이에 정확히 2명이 발표한다."], "ans": 3, "exp": "가능한 경우는 4가지다. G – F – C – B – D – E – A / G – F – C – B – E – D – A / G – F – D – C – B – E – A / G – F – E – C – B – D – A. ①은 G – F – C – B – D – E – A일 때 틀린다. ②는 G – F – C – B – D – E – A일 때 틀린다. ③은 G – F – C – B – D – E – A일 때 틀린다. ⑤는 G – F – D – C – B – E – A일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "A, B, C, D, E, F 6명이 원탁에 같은 간격으로 앉는다. 다음 조건을 모두 만족할 때, 항상 참인 것은?", "body": "<div class=\"given\"><p>B와 E는 이웃하여 앉는다.</p><p>E는 F의 바로 시계 방향 옆자리에 앉는다.</p><p>A와 B는 이웃하여 앉지 않는다.</p></div>", "opts": ["C와 D는 서로 마주 보고 앉는다.", "F는 A의 바로 시계 방향 옆자리에 앉는다.", "B는 E의 바로 시계 방향 옆자리에 앉는다.", "C와 D는 이웃하여 앉는다.", "D는 C의 바로 시계 방향 옆자리에 앉는다."], "ans": 2, "exp": "A의 자리를 기준으로 놓고 따지면 가능한 배치는 4가지다(시계 방향으로 A F E B C D, 시계 방향으로 A F E B D C, 시계 방향으로 A C F E B D, 시계 방향으로 A D F E B C). ①은 시계 방향으로 A F E B C D일 때 틀린다. ②는 시계 방향으로 A C F E B D일 때 틀린다. ④는 시계 방향으로 A C F E B D일 때 틀린다. ⑤는 시계 방향으로 A F E B D C일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "7층 건물에 A, B, C, D, E, F, G 7개 팀이 한 층씩 쓴다. 다음 조건을 모두 만족할 때, 반드시 거짓인 것은?", "body": "<div class=\"given\"><p>D는 3층에 있다.</p><p>F와 G 사이에 정확히 3개 층이 있다.</p><p>A와 G 사이에 정확히 5개 층이 있다.</p><p>B와 D는 바로 위아래로 붙어 있다.</p></div>", "opts": ["E는 F의 바로 위층에 있다.", "C와 F 사이에 정확히 1개 층이 있다.", "A와 E는 바로 위아래로 붙어 있다.", "G는 C보다 아래층에 있다.", "E와 F는 바로 위아래로 붙어 있다."], "ans": 1, "exp": "가능한 경우는 4가지다. 1층 G – 2층 B – 3층 D – 4층 C – 5층 F – 6층 E – 7층 A / 1층 G – 2층 B – 3층 D – 4층 E – 5층 F – 6층 C – 7층 A / 1층 G – 2층 C – 3층 D – 4층 B – 5층 F – 6층 E – 7층 A / 1층 G – 2층 E – 3층 D – 4층 B – 5층 F – 6층 C – 7층 A. ①은 1층 G – 2층 B – 3층 D – 4층 C – 5층 F – 6층 E – 7층 A일 때 성립한다. ③은 1층 G – 2층 B – 3층 D – 4층 C – 5층 F – 6층 E – 7층 A일 때 성립한다. ④는 1층 G – 2층 B – 3층 D – 4층 C – 5층 F – 6층 E – 7층 A일 때 성립한다. ⑤는 1층 G – 2층 B – 3층 D – 4층 C – 5층 F – 6층 E – 7층 A일 때 성립한다.", "fig": false}, {"sec": "C", "stem": "갑, 을, 병 3명은 기획팀, 개발팀, 영업팀에 한 명씩 배치되었고, 출신 지역은 서울, 대구, 인천으로 모두 다르다. 다음 조건을 모두 만족할 때, 반드시 참인 것은?", "body": "<div class=\"given\"><p>병은 대구 출신이다.</p><p>을은 영업팀이다.</p><p>을은 인천 출신이다.</p></div>", "opts": ["병은 인천 출신이다.", "갑은 서울 출신이다.", "갑이 개발팀이라면 갑은 인천 출신이다.", "병이 개발팀이라면 병은 인천 출신이다.", "병이 기획팀이라면 병은 인천 출신이다."], "ans": 1, "exp": "가능한 경우는 2가지다. 갑(기획팀, 서울), 을(영업팀, 인천), 병(개발팀, 대구) / 갑(개발팀, 서울), 을(영업팀, 인천), 병(기획팀, 대구). ①은 갑(기획팀, 서울), 을(영업팀, 인천), 병(개발팀, 대구)일 때 틀린다. ③은 갑(개발팀, 서울), 을(영업팀, 인천), 병(기획팀, 대구)일 때 틀린다. ④는 갑(기획팀, 서울), 을(영업팀, 인천), 병(개발팀, 대구)일 때 틀린다. ⑤는 갑(개발팀, 서울), 을(영업팀, 인천), 병(기획팀, 대구)일 때 틀린다.", "fig": false}, {"sec": "C", "stem": "6층 건물에 A, B, C, D, E, F 6개 팀이 한 층씩 쓴다. 다음 조건에 하나를 더하여 전체 배치가 하나로 확정되도록 할 때, 추가할 조건으로 알맞은 것은?", "body": "<div class=\"given\"><p>B와 E 사이에 정확히 1개 층이 있다.</p><p>E는 F보다 아래층에 있다.</p><p>D와 E 사이에 정확히 2개 층이 있다.</p><p>D와 F 사이에 정확히 1개 층이 있다.</p></div>", "opts": ["D는 F보다 아래층에 있다.", "D는 B의 바로 위층에 있다.", "C와 D 사이에 정확히 4개 층이 있다.", "C와 D는 바로 위아래로 붙어 있지 않다.", "F는 E의 바로 위층에 있다."], "ans": 2, "exp": "주어진 조건만으로는 10가지 배치가 가능하다. ①을 추가하면 2가지가 남는다. ②를 추가하면 8가지가 남는다. ③을 추가하면 1가지(1층 C – 2층 A – 3층 E – 4층 F – 5층 B – 6층 D)로 확정된다. ④를 추가하면 6가지가 남는다. ⑤를 추가하면 8가지가 남는다.", "fig": false}, {"sec": "C", "stem": "회사 비품 하나가 사라졌고, 가져간 사람은 한 명이다. 5명 중 한 명만 거짓을 말했다. 거짓을 말한 사람은? (범인이 누구인지는 묻지 않는다)", "body": "<div class=\"given\"><p>A: E가 범인이다.</p><p>B: D와 E 중 한 명이 범인이다.</p><p>C: C도 D도 범인이 아니다.</p><p>D: A와 E 중 한 명이 범인이다.</p><p>E: B의 말은 거짓이다.</p></div>", "opts": ["A", "B", "C", "D", "E"], "ans": 4, "exp": "범인을 한 명씩 가정해 본다. 범인이 A라면 거짓을 말한 사람이 2명이 되어 조건에 맞지 않는다. 범인이 B라면 거짓을 말한 사람이 3명이 되어 조건에 맞지 않는다. 범인이 C라면 거짓을 말한 사람이 4명이 되어 조건에 맞지 않는다. 범인이 D라면 거짓을 말한 사람이 4명이 되어 조건에 맞지 않는다. 범인이 E일 때만 거짓을 말한 사람이 E로 정확히 1명이 된다. 먼저 서로 모순되는 진술 쌍(한쪽이 참이면 다른 쪽이 거짓)을 찾으면 경우를 빨리 줄일 수 있다.", "fig": false}], "rules": ""};
+const CIRC = ['①','②','③','④','⑤'];
+const SECS = DATA.secs, QS = DATA.qs.map((q,i)=>({...q,id:i}));
+const KEY = 'dcat-cond-C';
+const secQs = id => QS.filter(q=>q.sec===id);
+const fmt = s => { s=Math.max(0,Math.ceil(s)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); };
+const totalTime = SECS.reduce((a,s)=>a+s.time,0);
+
+let S = fresh();
+function fresh(){ return {phase:'intro', si:0, qi:0, ans:{}, deadline:null, used:{}, confirm:false, filter:'all'}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const t=localStorage.getItem(KEY); return t?JSON.parse(t):null; }catch(e){ return null; } }
+
+const app = document.getElementById('app'), bar = document.getElementById('bar');
+let tick = null;
+
+function render(){
+  clearInterval(tick); tick=null;
+  bar.hidden = S.phase!=='test';
+  if(S.phase==='intro') renderIntro();
+  else if(S.phase==='brief') renderBrief();
+  else if(S.phase==='test') renderTest();
+  else renderResult();
+  save();
+}
+
+function renderIntro(){
+  const prev = load();
+  const resumable = prev && (prev.phase==='test'||prev.phase==='brief');
+  const rows = SECS.map(s=>`<tr><td>${s.name}</td><td>${s.n}문항, ${fmt(s.time)}</td><td>${s.real}</td></tr>`).join('');
+  app.innerHTML = `<section class="sheet">
+    <div class="kicker">Doosan Comprehensive Aptitude Test, 연습용</div>
+    <h1>DCAT 조건 추리 C</h1>
+    <p class="lede">언어논리 영역의 조건 추리 유형만 모은 세트입니다. 실제 시험처럼 문항당 1분, 15문항 15분으로 구성했습니다. 모든 문제는 가능한 경우를 전부 따져 정답을 확인했고, 해설에 가능한 배치와 오답 보기의 반례를 적었습니다.</p>
+    <div class="tbl-scroll"><table class="plan"><thead><tr><th>영역</th><th>이번 모의고사</th><th>실제 시험(응시 후기 기준)</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+    <ul class="rules">
+      <li>5지선다입니다. 고른 답을 다시 누르면 선택이 취소됩니다.</li>
+      <li>시간이 끝나면 그 영역은 자동 제출되고 다음 영역 안내로 넘어갑니다.</li>
+      <li>오답 감점이 있다는 응시 후기가 많습니다. 확신이 없으면 비워 두는 연습도 해 보세요.</li>
+      <li>공간추리, 도형추리는 실제로 메모가 금지되니 종이 없이 푸는 것을 권합니다.</li>
+      <li>실제 문항 수와 시간은 회차마다 바뀔 수 있습니다.</li>
+    </ul>
+    <div class="row">
+      <button class="btn primary" id="go">첫 영역 안내 보기</button>
+      ${resumable?'<button class="btn" id="resume">이어서 풀기</button>':''}
+    </div></section>`;
+  document.getElementById('go').onclick=()=>{ S=fresh(); S.phase='brief'; render(); window.scrollTo(0,0); };
+  if(resumable) document.getElementById('resume').onclick=()=>{ S=prev; render(); };
+}
+
+function renderBrief(){
+  const s = SECS[S.si];
+  const timedOut = S.si>0 && S.lastTimeout;
+  app.innerHTML = `<section class="sheet">
+    ${timedOut?`<p class="pill skip" style="margin:0 0 10px">이전 영역 시간 종료로 자동 제출됨</p>`:''}
+    <div class="kicker">영역 ${S.si+1} / ${SECS.length}</div>
+    <h1>${s.name}</h1>
+    <div class="brief-meta"><div><b>${s.n}</b><span>문항</span></div><div><b>${fmt(s.time)}</b><span>제한시간</span></div><div><b>${Math.round(s.time/s.n)}초</b><span>문항당 평균</span></div></div>
+    <p class="lede">${s.desc}</p>
+    ${s.example||''}
+    <p class="tip">${s.tip}</p>
+    <button class="btn primary" id="start">시작하기, 타이머가 바로 시작됩니다</button></section>`;
+  document.getElementById('start').onclick=()=>{
+    S.phase='test'; S.qi=0; S.confirm=false; S.deadline=Date.now()+s.time*1000; S.lastTimeout=false; render(); window.scrollTo(0,0);
+  };
+}
+
+function optHTML(q, i, extra){
+  return `<button class="opt ${extra||''}" data-i="${i}" aria-pressed="${S.ans[q.id]===i}"><span class="cn">${CIRC[i]}</span><span class="ot">${q.opts[i]}</span></button>`;
+}
+
+function renderTest(){
+  const s = SECS[S.si], qs = secQs(s.id), q = qs[S.qi];
+  const unanswered = qs.filter(x=>S.ans[x.id]===undefined).length;
+  bar.innerHTML = `<div class="bar-in"><span class="sec">${s.name}</span><span class="step">${S.qi+1} / ${qs.length}, 미응답 ${unanswered}</span><span class="grow"></span><span class="timer" id="tm">--:--</span></div>`;
+  app.innerHTML = `<section class="sheet">
+    <div class="qhead"><span class="qno">${String(S.qi+1).padStart(2,'0')}</span><div class="stem">${q.stem}</div></div>
+    ${q.body?`<div class="body">${q.body}</div>`:''}
+    <div class="opts ${q.fig?'fig':''}">${q.opts.map((_,i)=>optHTML(q,i)).join('')}</div>
+    <div class="nav">
+      <div class="row"><button class="btn" id="prev" ${S.qi===0?'disabled':''}>이전</button><button class="btn" id="next" ${S.qi===qs.length-1?'disabled':''}>다음</button></div>
+      <button class="btn ${S.si===SECS.length-1?'primary':''}" id="end">${S.si===SECS.length-1?'시험 제출':'영역 종료'}</button>
+    </div>
+    ${S.confirm?`<div class="confirm"><p>${unanswered?`미응답 ${unanswered}문항이 남았습니다. `:''}종료하면 이 영역으로 돌아올 수 없습니다.</p><div class="row"><button class="btn" id="cancel">계속 풀기</button><button class="btn primary" id="doend">종료하고 넘어가기</button></div></div>`:''}
+    <div class="pal" aria-label="문항 이동">${qs.map((x,i)=>`<button class="chip ${S.ans[x.id]!==undefined?'done':''} ${i===S.qi?'cur':''}" data-q="${i}" aria-label="${i+1}번 문항">${i+1}</button>`).join('')}</div>
+  </section>`;
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; if(S.ans[q.id]===i) delete S.ans[q.id]; else S.ans[q.id]=i; render(); });
+  app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ S.qi=+b.dataset.q; S.confirm=false; render(); window.scrollTo(0,0); });
+  const go = d=>{ S.qi+=d; S.confirm=false; render(); window.scrollTo(0,0); };
+  document.getElementById('prev').onclick=()=>go(-1);
+  document.getElementById('next').onclick=()=>go(1);
+  document.getElementById('end').onclick=()=>{ S.confirm=true; render(); };
+  if(S.confirm){ document.getElementById('cancel').onclick=()=>{S.confirm=false;render();}; document.getElementById('doend').onclick=()=>endSection(false); }
+  const tm=document.getElementById('tm');
+  const upd=()=>{ const left=(S.deadline-Date.now())/1000; tm.textContent=fmt(left); tm.classList.toggle('low',left<=60); tm.classList.toggle('blink',left<=10);
+    if(left<=0) endSection(true); };
+  upd(); tick=setInterval(upd,250);
+}
+
+function endSection(timeout){
+  const s = SECS[S.si];
+  S.used[s.id] = Math.min(s.time, Math.round(s.time - Math.max(0,(S.deadline-Date.now())/1000)));
+  S.confirm=false; S.deadline=null;
+  if(S.si===SECS.length-1){ S.phase='result'; }
+  else { S.si++; S.phase='brief'; S.lastTimeout=timeout; }
+  render(); window.scrollTo(0,0);
+}
+
+function stat(id){
+  const qs=secQs(id); let ok=0,bad=0,skip=0;
+  qs.forEach(q=>{ const a=S.ans[q.id]; if(a===undefined) skip++; else if(a===q.ans) ok++; else bad++; });
+  return {n:qs.length,ok,bad,skip};
+}
+
+function renderResult(){
+  const st = SECS.map(s=>({s,...stat(s.id)}));
+  const ok = st.reduce((a,x)=>a+x.ok,0), bad=st.reduce((a,x)=>a+x.bad,0), skip=st.reduce((a,x)=>a+x.skip,0);
+  const rows = st.map(x=>`<tr><td>${x.s.name}</td><td>${x.ok} / ${x.n}</td><td>${x.bad}</td><td>${x.skip}</td><td>${fmt(S.used[x.s.id]??0)} / ${fmt(x.s.time)}</td><td><div class="meter"><i style="width:${Math.round(x.ok/x.n*100)}%"></i></div></td></tr>`).join('');
+  const f = S.filter;
+  let review='';
+  SECS.forEach(s=>{
+    const items = secQs(s.id).map((q,i)=>{
+      const a=S.ans[q.id], state=a===undefined?'skip':(a===q.ans?'ok':'bad');
+      if(f==='wrong' && state==='ok') return '';
+      const label={ok:'정답',bad:'오답',skip:'미응답'}[state];
+      const opts=q.opts.map((o,k)=>`<div class="opt ${k===q.ans?'is-ans':''} ${k===a&&a!==q.ans?'is-wrong':''}"><span class="cn">${CIRC[k]}</span><span class="ot">${o}</span></div>`).join('');
+      return `<article class="rv"><div class="rv-h"><span class="qno">${String(i+1).padStart(2,'0')}</span><span class="pill ${state}">${label}</span><span class="note" style="margin:0">정답 ${CIRC[q.ans]}${a!==undefined&&a!==q.ans?`, 내 답 ${CIRC[a]}`:''}</span></div>
+        <div class="stem">${q.stem}</div>
+        ${q.body?`<details><summary>문제 자료 보기</summary><div class="body" style="margin-top:8px">${q.body}</div></details>`:''}
+        <div class="opts ${q.fig?'fig':''}">${opts}</div>
+        <div class="exp"><b>해설</b> ${q.exp}</div></article>`;
+    }).join('');
+    if(items.trim()) review += `<h2 class="sec-title">${s.name}</h2>${items}`;
+  });
+  if(!review) review='<p class="note">틀리거나 비운 문항이 없습니다.</p>';
+  app.innerHTML = `<section class="sheet">
+    <div class="kicker">채점 결과</div>
+    <h1>DCAT 조건 추리 C</h1>
+    <div class="score"><b>${ok}</b><span>/ ${QS.length} 정답, 오답 ${bad}, 미응답 ${skip}</span></div>
+    <div class="tbl-scroll"><table class="plan"><thead><tr><th>영역</th><th>정답</th><th>오답</th><th>미응답</th><th>사용 시간</th><th>정답률</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="row"><button class="btn" id="again">처음부터 다시 풀기</button></div>
+    <div class="filter" role="group" aria-label="해설 보기 범위"><button data-f="all" aria-pressed="${f==='all'}">전체 해설</button><button data-f="wrong" aria-pressed="${f==='wrong'}">틀리거나 비운 문항만</button></div>
+    ${review}
+  </section>`;
+  document.getElementById('again').onclick=()=>{ S=fresh(); render(); window.scrollTo(0,0); };
+  app.querySelectorAll('.filter button').forEach(b=>b.onclick=()=>{ S.filter=b.dataset.f; render(); });
+}
+
+function start(data){
+  if(data && data.S) S=data.S;
+  window.claude?.hot?.snapshot?.(()=>({S}));
+  render();
+}
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+<script src="export.js"></script>
+</body></html>

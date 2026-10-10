@@ -1,0 +1,443 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:9;background:#28498a;color:#fff;font:600 13px system-ui,sans-serif;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2)">← 목록</a>
+<title>조건추리 연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* 레이아웃: 시험지처럼 한 줄 칼럼. 상황, 조건, 질문, 보기 순서이고 풀이는 접어서 숨김. */
+:root{
+  --bg:#f2f4f8;
+  --surface:#ffffff;
+  --ink:#1b2231;
+  --muted:#586176;
+  --rule:#c7cedb;
+  --soft:#e6ebf4;
+  --accent:#2c52d4;
+  --accent-ink:#ffffff;
+  --good:#17725a;
+  --bad:#b3362e;
+  --font-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12151c;--surface:#1a1f2a;--ink:#e8ecf4;--muted:#9ba5ba;--rule:#384257;--soft:#232a38;
+    --accent:#87a0ff;--accent-ink:#0e1322;--good:#5ccfa4;--bad:#ff9087;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12151c;--surface:#1a1f2a;--ink:#e8ecf4;--muted:#9ba5ba;--rule:#384257;--soft:#232a38;
+  --accent:#87a0ff;--accent-ink:#0e1322;--good:#5ccfa4;--bad:#ff9087;color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.7;padding-inline:16px;padding-block:28px 56px}
+.wrap{max-width:760px;margin-inline:auto}
+h1,h2,h3,h4,p,ul,ol,dl,dd{margin:0}
+h1,h2,h3{text-wrap:balance}
+
+.kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+h1{font-size:30px;line-height:1.25;font-weight:600;margin-top:6px}
+.lead{margin-top:10px;color:var(--muted);max-width:60ch}
+.notes{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin-top:20px;padding-block:14px;border-block:1px solid var(--rule)}
+.notes dt{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--muted);padding-top:3px}
+.notes dd{min-width:0;max-width:62ch}
+.jump{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.jump a{color:var(--accent);text-decoration:none;font-weight:500;border:1px solid var(--rule);border-radius:999px;padding:4px 14px;background:var(--surface)}
+.jump a:hover{border-color:var(--accent)}
+
+.set{margin-top:44px}
+.set-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.set-head h2{font-size:22px;font-weight:600}
+.tag{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;color:var(--accent);border:1px solid currentColor;border-radius:4px;padding:1px 8px}
+.set-intro{margin-top:6px;color:var(--muted);max-width:62ch}
+.set-tools{margin-top:12px}
+.btn{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:5px 12px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.q{margin-top:26px;padding-top:22px;border-top:1px solid var(--rule)}
+.q h3{font-family:var(--font-mono);font-size:13px;letter-spacing:.1em;color:var(--muted);font-weight:500;text-transform:uppercase}
+.setup{margin-top:8px;max-width:62ch}
+.lab{margin-top:14px;font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.says,.conds{margin-top:4px;padding:12px 16px 12px 34px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;display:grid;gap:4px;max-width:62ch}
+.says{list-style:none;padding-left:16px}
+.says b{font-family:var(--font-mono);font-weight:500;margin-right:6px}
+.ask{margin-top:16px;font-weight:600}
+.choices{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:8px;max-width:62ch}
+.opt{font:inherit;color:inherit;width:100%;display:flex;align-items:flex-start;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.bub{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--ink);font-family:var(--font-mono);font-size:13px;margin-top:1px}
+.opt[aria-pressed="true"] .bub{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.txt{min-width:0;padding-top:2px}
+
+.ans{margin-top:14px}
+.ans summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-weight:500;color:var(--accent);padding-block:4px}
+.ans summary::-webkit-details-marker{display:none}
+.ans summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.ans[open] summary::before{transform:rotate(45deg)}
+.body{margin-top:8px;padding:14px 16px;background:var(--soft);border-radius:8px;display:grid;gap:14px;max-width:68ch}
+.verdict{font-size:17px}
+.verdict b{color:var(--good)}
+.mine{font-size:14px}
+.mine.ok{color:var(--good)}
+.mine.no{color:var(--bad)}
+.body h4{font-size:12px;font-family:var(--font-mono);letter-spacing:.06em;color:var(--muted);font-weight:500;margin-bottom:2px}
+.cases{padding-left:0;list-style:none;display:grid;gap:2px}
+.cases li{display:flex;gap:10px}
+.cases li span:first-child{flex:none;font-family:var(--font-mono);font-size:13px;color:var(--muted);min-width:5.2em}
+.body ul.vd{padding-left:18px;display:grid;gap:4px}
+@media (prefers-reduced-motion: reduce){.ans summary::before{transition:none}}
+@media (max-width:420px){h1{font-size:26px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">DCAT 조건추리</p>
+    <h1>조건추리 연습</h1>
+    <p class="lead">두 세트, 세트마다 다섯 문제야. 조건을 만족하는 경우를 전부 따져서 만들었기 때문에 정답은 항상 하나뿐이야.</p>
+    <dl class="notes">
+      <dt>푸는 순서</dt>
+      <dd>조건에서 확실하게 정해지는 것부터 표시하고, 남는 경우를 몇 가지로 나눠 보기를 하나씩 대입해 봐. 항상 참이라는 건 나눈 경우가 전부 참이라는 뜻이야.</dd>
+      <dt>풀이 구성</dt>
+      <dd>풀이에는 조건을 만족하는 경우를 전부 적어뒀어. 틀린 보기는 어느 경우에서 어긋나는지도 같이 적었어.</dd>
+    </dl>
+    <nav class="jump" aria-label="세트 이동"><a href="#set1">세트 1 기본</a><a href="#set2">세트 2 심화</a></nav>
+  </header>
+  <main id="root"></main>
+</div>
+
+<script>
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(arr,rng){for(var i=arr.length-1;i>0;i--){var j=Math.floor(rng()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
+
+/* ---------- 전체 경우의 수(universe) ---------- */
+function permUniverse(names){
+  var n=names.length,res=[],used=[],cur=[];
+  (function rec(i){
+    if(i===n){var o={};names.forEach(function(nm,k){o[nm]=cur[k];});res.push(o);return;}
+    for(var v=1;v<=n;v++){if(used[v])continue;used[v]=true;cur[i]=v;rec(i+1);used[v]=false;}
+  })(0);
+  return res;
+}
+function subsetUniverse(names,k){
+  var res=[];
+  (function rec(i,chosen){
+    if(chosen.length===k){var o={};names.forEach(function(nm){o[nm]=chosen.indexOf(nm)>=0;});res.push(o);return;}
+    if(i>=names.length)return;
+    rec(i+1,chosen.concat([names[i]]));
+    rec(i+1,chosen);
+  })(0,[]);
+  return res;
+}
+function culpritUniverse(names){return names.map(function(c){return {c:c};});}
+
+/* ---------- 보기 후보 ---------- */
+var THEMES={
+  line:{
+    at:function(X,k){return X+'는 '+k+'번째에 있다';},
+    edge:function(X){return X+'는 맨 앞이나 맨 뒤에 있다';},
+    before:function(X,Y){return X+'는 '+Y+'보다 앞에 있다';},
+    adj:function(X,Y){return X+'와 '+Y+'는 이웃해 있다';},
+    between:function(X,Y,Z){return X+'는 '+Y+'와 '+Z+' 사이에 있다';},
+    show:function(sol,names){var arr=[];names.forEach(function(nm){arr[sol[nm]-1]=nm;});return '앞에서부터 '+arr.join(', ');}
+  },
+  week:{
+    days:['월요일','화요일','수요일','목요일','금요일'],
+    at:function(X,k){return X+'는 '+this.days[k-1]+'에 당직이다';},
+    edge:function(X){return X+'는 월요일이나 금요일에 당직이다';},
+    before:function(X,Y){return X+'는 '+Y+'보다 먼저 당직이다';},
+    adj:function(X,Y){return X+'와 '+Y+'는 연이은 요일에 당직이다';},
+    between:function(X,Y,Z){return X+'의 당직 요일은 '+Y+'와 '+Z+'의 당직 요일 사이에 있다';},
+    show:function(sol,names){var arr=[];names.forEach(function(nm){arr[sol[nm]-1]=nm;});return arr.map(function(nm,i){return '월화수목금'[i]+' '+nm;}).join(', ');}
+  }
+};
+function permStatements(names,th){
+  var n=names.length,out=[];
+  names.forEach(function(X){
+    for(var k=1;k<=n;k++)(function(k){out.push({text:th.at(X,k),test:function(s){return s[X]===k;}});})(k);
+    out.push({text:th.edge(X),test:function(s){return s[X]===1||s[X]===n;}});
+    names.forEach(function(Y){
+      if(X===Y)return;
+      out.push({text:th.before(X,Y),test:function(s){return s[X]<s[Y];}});
+      if(X<Y)out.push({text:th.adj(X,Y),test:function(s){return Math.abs(s[X]-s[Y])===1;}});
+      names.forEach(function(Z){
+        if(Z===X||Z<=Y)return;
+        out.push({text:th.between(X,Y,Z),test:function(s){return (s[X]-s[Y])*(s[X]-s[Z])<0;}});
+      });
+    });
+  });
+  return out;
+}
+function subsetStatements(names){
+  var out=[];
+  names.forEach(function(X){
+    out.push({text:X+'는 선발된다',test:function(s){return s[X];}});
+    out.push({text:X+'는 선발되지 않는다',test:function(s){return !s[X];}});
+    names.forEach(function(Y){
+      if(Y<=X)return;
+      out.push({text:X+'와 '+Y+'는 함께 선발된다',test:function(s){return s[X]&&s[Y];}});
+      out.push({text:X+'와 '+Y+' 중 적어도 한 명은 선발된다',test:function(s){return s[X]||s[Y];}});
+      out.push({text:X+'와 '+Y+' 중 정확히 한 명만 선발된다',test:function(s){return s[X]!==s[Y];}});
+      out.push({text:X+'와 '+Y+'는 둘 다 선발되지 않는다',test:function(s){return !s[X]&&!s[Y];}});
+    });
+  });
+  return out;
+}
+function culpritStatements(names,says){
+  var out=[];
+  names.forEach(function(X){
+    out.push({text:'범인은 '+X+'이다',test:function(s){return s.c===X;}});
+    out.push({text:'범인은 '+X+'가 아니다',test:function(s){return s.c!==X;}});
+    var sy=says.filter(function(a){return a.who===X;})[0];
+    out.push({text:X+'의 진술은 참이다',test:function(s){return sy.f(s.c);}});
+    out.push({text:X+'의 진술은 거짓이다',test:function(s){return !sy.f(s.c);}});
+    names.forEach(function(Y){
+      if(Y<=X)return;
+      out.push({text:'범인은 '+X+'나 '+Y+' 중 한 명이다',test:function(s){return s.c===X||s.c===Y;}});
+    });
+  });
+  return out;
+}
+
+function vec(U,f){return U.map(function(s){return f(s)?1:0;}).join('');}
+function implies(a,b){for(var i=0;i<a.length;i++){if(a[i]==='1'&&b[i]!=='1')return false;}return true;}
+function neg(v){return v.split('').map(function(c){return c==='1'?'0':'1';}).join('');}
+
+/* ---------- 문제 만들기 ---------- */
+function buildProblem(spec,seed){
+  var rng=mulberry32(seed),names=spec.names,U,stmts,show,th;
+  if(spec.kind==='perm'){th=THEMES[spec.theme];U=permUniverse(names);stmts=permStatements(names,th);show=function(s){return th.show(s,names);};}
+  else if(spec.kind==='subset'){U=subsetUniverse(names,spec.k);stmts=subsetStatements(names);show=function(s){return '{'+names.filter(function(nm){return s[nm];}).join(', ')+'}';};}
+  else{U=culpritUniverse(names);stmts=culpritStatements(names,spec.says);show=function(s){return '범인은 '+s.c;};}
+
+  var conds=spec.conds;
+  if(spec.kind==='culprit'){
+    conds=[{text:spec.condText,test:function(s){var c=0;spec.says.forEach(function(a){if(a.f(s.c))c++;});return spec.condFn(c);}}];
+  }
+  var sols=U.filter(function(s){return conds.every(function(c){return c.test(s);});});
+
+  var report={cases:sols.length,redundant:[]};
+  conds.forEach(function(c,i){
+    var rest=conds.filter(function(_,j){return j!==i;});
+    var n2=U.filter(function(s){return rest.every(function(d){return d.test(s);});}).length;
+    if(n2===sols.length)report.redundant.push(i+1);
+  });
+
+  var condV=conds.map(function(c){return vec(U,c.test);});
+  var seen={},pool=[];
+  stmts.forEach(function(st){
+    var v=vec(U,st.test);if(seen[v])return;seen[v]=1;
+    var tr=0;sols.forEach(function(s){if(st.test(s))tr++;});
+    var cls=tr===sols.length?'always':(tr===0?'never':'some');
+    var ask0=spec.ask;
+    var trivial=spec.kind==='culprit'?false:ask0==='true'?condV.some(function(cv){return implies(cv,v);}):condV.some(function(cv){return implies(v,neg(cv));});
+    pool.push({text:st.text,test:st.test,cls:cls,trivial:trivial});
+  });
+  var ask=spec.ask;
+  var target=ask==='true'?'always':'never';
+  var corr=shuffle(pool.filter(function(p){return p.cls===target&&!p.trivial;}),rng);
+  if(!corr.length)throw new Error('정답 후보 없음: '+spec.id);
+  var right=corr[0];
+  var some=shuffle(pool.filter(function(p){return p.cls==='some';}),rng);
+  var other=shuffle(pool.filter(function(p){return p.cls===(ask==='true'?'never':'always')&&p!==right;}),rng);
+  if(some.length<3||!other.length)throw new Error('오답 후보 부족: '+spec.id+' some '+some.length+' other '+other.length);
+  var wrong=[some[0],some[1],some[2],other[0]];
+  var order=[],w=shuffle(wrong.slice(),rng),k=0;
+  for(var i=0;i<5;i++)order.push(i===spec.ans?right:w[k++]);
+
+  var cases=sols.map(show);
+  var verdicts=order.map(function(c,i){
+    if(i===spec.ans)return ask==='true'?'모든 경우에서 참이야.':'모든 경우에서 거짓이야.';
+    if(ask==='true'){
+      if(c.cls==='never')return '모든 경우에서 거짓이야.';
+      var j=sols.findIndex(function(s){return !c.test(s);});
+      return '경우 '+(j+1)+'에서 거짓이라 항상 참은 아니야.';
+    }
+    if(c.cls==='always')return '모든 경우에서 참이라 거짓이 아니야.';
+    var j2=sols.findIndex(function(s){return c.test(s);});
+    return '경우 '+(j2+1)+'에서 참이 될 수 있어.';
+  });
+  return {spec:spec,hint:spec.hint,order:order,ans:spec.ans,cases:cases,verdicts:verdicts,report:report,
+    conds:conds.map(function(c){return c.text;}),
+    qtext:ask==='true'?'다음 중 항상 참인 것은?':'다음 중 반드시 거짓인 것은?'};
+}
+
+/* ---------- 문제 목록 ---------- */
+var L5=['A','B','C','D','E'],L6=['A','B','C','D','E','F'];
+var SETS=[
+  {id:'set1',title:'세트 1',sub:'기본',
+   intro:'조건이 3개에서 4개야. 줄 세우기, 요일 배정, 인원 선발, 거짓말 추리가 한 번씩 나와.',
+   probs:[]},
+  {id:'set2',title:'세트 2',sub:'심화',
+   intro:'조건이 늘고 인원이 6명인 문제가 들어가. 반드시 거짓인 것을 고르는 문제도 있어.',
+   probs:[]}
+];
+function T(s){return s;}
+var SPECS=[
+  /* 세트 1 */
+  {id:'1-1',hint:"C가 D 바로 뒤라서 D와 C는 D, C 순서의 한 덩어리로 움직여. 여기에 A는 B보다 앞, E는 D보다 뒤, B는 2번째가 아니라는 조건을 맞춰 넣으면 5가지가 나와. 5가지 모두 B가 C보다 뒤에 있어서 C는 D와 B 사이에 있게 돼.",set:0,kind:'perm',theme:'line',names:L5,ask:'true',ans:2,
+   intro:'A, B, C, D, E 5명이 한 줄로 서 있다. 왼쪽 맨 앞이 1번째, 맨 뒤가 5번째이다.',
+   conds:[
+     {text:'A는 B보다 앞에 있다.',test:function(p){return p.A<p.B;}},
+     {text:'C는 D 바로 뒤에 있다.',test:function(p){return p.C===p.D+1;}},
+     {text:'E는 D보다 뒤에 있다.',test:function(p){return p.E>p.D;}},
+     {text:'B는 2번째에 있지 않다.',test:function(p){return p.B!==2;}}
+   ]},
+  {id:'1-2',hint:"조건을 모두 맞추면 수요일은 늘 C이고, 월요일과 화요일은 A와 B가, 목요일과 금요일은 D와 E가 나눠 서. B는 D와 E보다 늘 먼저야.",set:0,kind:'perm',theme:'week',names:L5,ask:'true',ans:0,
+   intro:'A, B, C, D, E 5명이 월요일부터 금요일까지 하루씩 당직을 선다. 같은 날 당직인 사람은 없다.',
+   conds:[
+     {text:'A는 C보다 먼저 당직을 선다.',test:function(p){return p.A<p.C;}},
+     {text:'B는 수요일에 당직을 서지 않는다.',test:function(p){return p.B!==3;}},
+     {text:'D와 E는 연이은 요일에 당직을 선다.',test:function(p){return Math.abs(p.D-p.E)===1;}},
+     {text:'C는 금요일에 당직을 서지 않는다.',test:function(p){return p.C!==5;}},
+     {text:'B는 D보다 먼저 당직을 선다.',test:function(p){return p.B<p.D;}}
+   ]},
+  {id:'1-3',hint:"B가 빠진다고 가정해 봐. 그러면 A도 빠져야 하고, 남은 C, D, E, F 중 3명을 골라야 하는데 E와 F는 한 명만 가능해서 C와 D를 둘 다 뽑아야 해. 그런데 C가 뽑히면 D는 빠져야 하니까 모순이야. 그래서 B는 늘 선발되고, B와 D 중 적어도 한 명은 항상 선발돼.",set:0,kind:'subset',names:L6,k:3,ask:'true',ans:4,
+   intro:'A, B, C, D, E, F 6명 중에서 3명을 대표로 선발한다.',
+   conds:[
+     {text:'A가 선발되면 B도 선발된다.',test:function(s){return !s.A||s.B;}},
+     {text:'C가 선발되면 D는 선발되지 않는다.',test:function(s){return !s.C||!s.D;}},
+     {text:'E와 F 중 정확히 한 명만 선발된다.',test:function(s){return s.E!==s.F;}},
+     {text:'D가 선발되면 E는 선발되지 않는다.',test:function(s){return !s.D||!s.E;}}
+   ]},
+  {id:'1-4',hint:"범인을 한 명씩 가정하고 참인 진술 수를 세 봐. A가 범인이면 1개, B면 2개, C면 4개, D면 2개, E면 3개가 참이야. 정확히 2개가 되는 B와 D만 남아. D는 범인이 E라고 말했는데, B나 D가 범인이면 이 진술은 거짓이야.",set:0,kind:'culprit',names:L5,ask:'true',ans:1,
+   intro:'유리창을 깬 범인은 A, B, C, D, E 중 정확히 한 명이다. 다섯 명은 다음과 같이 말했다.',
+   says:[
+     {who:'A',text:'범인은 B나 C이다.',f:function(c){return c==='B'||c==='C';}},
+     {who:'B',text:'나는 범인이 아니다.',f:function(c){return c!=='B';}},
+     {who:'C',text:'범인은 A가 아니다.',f:function(c){return c!=='A';}},
+     {who:'D',text:'범인은 E이다.',f:function(c){return c==='E';}},
+     {who:'E',text:'범인은 C이다.',f:function(c){return c==='C';}}
+   ],
+   condText:'다섯 명의 진술 중 정확히 2개만 참이다.',condFn:function(n){return n===2;}},
+  {id:'1-5',hint:"C가 A와 B 사이에 있고, D는 E보다 뒤, A는 맨 앞이 아니고, B와 D는 이웃해야 해. 이걸 맞추면 4가지가 나오는데 E가 4가지 모두 맨 앞이야. 그래서 E는 B보다 늘 앞에 있어.",set:0,kind:'perm',theme:'line',names:L5,ask:'true',ans:3,
+   intro:'A, B, C, D, E 5명이 한 줄로 서 있다. 왼쪽 맨 앞이 1번째, 맨 뒤가 5번째이다.',
+   conds:[
+     {text:'C는 A와 B 사이에 있다.',test:function(p){return (p.C-p.A)*(p.C-p.B)<0;}},
+     {text:'D는 E보다 뒤에 있다.',test:function(p){return p.D>p.E;}},
+     {text:'A는 맨 앞에 있지 않다.',test:function(p){return p.A!==1;}},
+     {text:'B와 D는 이웃해 있다.',test:function(p){return Math.abs(p.B-p.D)===1;}}
+   ]},
+  /* 세트 2 */
+  {id:'2-1',hint:"E가 F 바로 앞이고 F가 B보다 앞이니까, 이어서 E는 B보다 앞이야. 나머지 A, C, D의 자리는 여러 가지로 나뉘어서 8가지가 나와.",set:1,kind:'perm',theme:'line',names:L6,ask:'true',ans:1,
+   intro:'A, B, C, D, E, F 6명이 한 줄로 서 있다. 왼쪽 맨 앞이 1번째, 맨 뒤가 6번째이다.',
+   conds:[
+     {text:'A는 B보다 앞에 있다.',test:function(p){return p.A<p.B;}},
+     {text:'C와 D 사이에는 정확히 한 명이 서 있다.',test:function(p){return Math.abs(p.C-p.D)===2;}},
+     {text:'E는 F 바로 앞에 있다.',test:function(p){return p.E+1===p.F;}},
+     {text:'F는 B보다 앞에 있다.',test:function(p){return p.F<p.B;}}
+   ]},
+  {id:'2-2',hint:"A는 월요일이나 금요일이고, E는 B보다, B는 C보다 먼저라서 E, B, C 순서는 늘 정해져. 여기에 C와 D가 연이은 요일이라는 조건까지 맞추면 4가지가 나와. 이 4가지 모두 A와 B는 이웃한 요일이 아니야.",set:1,kind:'perm',theme:'week',names:L5,ask:'false',ans:3,
+   intro:'A, B, C, D, E 5명이 월요일부터 금요일까지 하루씩 당직을 선다. 같은 날 당직인 사람은 없다.',
+   conds:[
+     {text:'A는 월요일이나 금요일에 당직을 선다.',test:function(p){return p.A===1||p.A===5;}},
+     {text:'B는 C보다 먼저 당직을 선다.',test:function(p){return p.B<p.C;}},
+     {text:'C와 D는 연이은 요일에 당직을 선다.',test:function(p){return Math.abs(p.C-p.D)===1;}},
+     {text:'E는 B보다 먼저 당직을 선다.',test:function(p){return p.E<p.B;}}
+   ]},
+  {id:'2-3',hint:"A와 E가 둘 다 빠진다고 가정해 봐. C가 선발되면 A가 있어야 하니까 C도 빠지고, D가 빠지면 E가 선발돼야 하니까 D는 선발돼. 남는 후보는 B, D, F인데 3명을 채우려면 셋 다 뽑아야 해. 그런데 F가 뽑히면 D는 빠져야 해서 모순이야. 그래서 A와 E 중 적어도 한 명은 항상 선발돼.",set:1,kind:'subset',names:L6,k:3,ask:'true',ans:0,
+   intro:'A, B, C, D, E, F 6명 중에서 3명을 프로젝트 팀원으로 선발한다.',
+   conds:[
+     {text:'A와 B는 함께 선발되지 않는다.',test:function(s){return !(s.A&&s.B);}},
+     {text:'C가 선발되면 A도 선발된다.',test:function(s){return !s.C||s.A;}},
+     {text:'D가 선발되지 않으면 E가 선발된다.',test:function(s){return s.D||s.E;}},
+     {text:'F가 선발되면 D는 선발되지 않는다.',test:function(s){return !s.F||!s.D;}}
+   ]},
+  {id:'2-4',hint:"범인을 한 명씩 가정하고 참인 진술 수를 세 봐. A가 범인이면 4개, B면 2개, C면 2개, D와 E면 3개가 참이야. 정확히 3개가 되는 D와 E만 남아서 범인이 A인 경우는 없어.",set:1,kind:'culprit',names:L5,ask:'true',ans:2,
+   intro:'회사 비품을 가져간 사람은 A, B, C, D, E 중 정확히 한 명이다. 다섯 명은 다음과 같이 말했다.',
+   says:[
+     {who:'A',text:'범인은 C이거나 D이다.',f:function(c){return c==='C'||c==='D';}},
+     {who:'B',text:'범인은 A이다.',f:function(c){return c==='A';}},
+     {who:'C',text:'범인은 B가 아니다.',f:function(c){return c!=='B';}},
+     {who:'D',text:'범인은 C가 아니다.',f:function(c){return c!=='C';}},
+     {who:'E',text:'A의 진술은 거짓이다.',f:function(c){return !(c==='C'||c==='D');}}
+   ],
+   condText:'다섯 명의 진술 중 정확히 3개만 참이다.',condFn:function(n){return n===3;}},
+  {id:'2-5',hint:"E는 A와 C 사이에 있고, C는 D보다 앞, B는 D보다 뒤, A와 B는 이웃하지 않아. 이걸 맞추면 3가지가 나오고, A는 1번째나 3번째나 5번째에만 서. 그래서 A가 2번째인 경우는 없어.",set:1,kind:'perm',theme:'line',names:L5,ask:'false',ans:0,
+   intro:'A, B, C, D, E 5명이 한 줄로 서 있다. 왼쪽 맨 앞이 1번째, 맨 뒤가 5번째이다.',
+   conds:[
+     {text:'A와 B는 이웃해 있지 않다.',test:function(p){return Math.abs(p.A-p.B)>1;}},
+     {text:'C는 D보다 앞에 있다.',test:function(p){return p.C<p.D;}},
+     {text:'E는 A와 C 사이에 있다.',test:function(p){return (p.E-p.A)*(p.E-p.C)<0;}},
+     {text:'B는 D보다 뒤에 있다.',test:function(p){return p.B>p.D;}}
+   ]}
+];
+
+function buildAll(){
+  var sets=SETS.map(function(s){return {id:s.id,title:s.title,sub:s.sub,intro:s.intro,probs:[]};});
+  SPECS.forEach(function(sp,i){sets[sp.set].probs.push(buildProblem(sp,9100+i*37));});
+  return sets;
+}
+if(typeof module!=='undefined')module.exports={buildAll:buildAll,buildProblem:buildProblem,SPECS:SPECS};
+
+
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function explain(p){
+  var h='<p class="verdict">정답 <b>'+(p.ans+1)+'번</b></p><p class="mine" aria-live="polite"></p>';
+  h+='<div><h4>추리 과정</h4><p>'+esc(p.hint)+'</p></div>';
+  h+='<div><h4>조건을 모두 만족하는 경우, 전부 '+p.cases.length+'가지</h4><ol class="cases">';
+  p.cases.forEach(function(c,i){h+='<li><span>경우 '+(i+1)+'</span><span>'+esc(c)+'</span></li>';});
+  h+='</ol></div>';
+  h+='<div><h4>보기별 확인</h4><ul class="vd">';
+  p.order.forEach(function(c,i){h+='<li><b>'+(i+1)+'번</b> '+esc(p.verdicts[i])+'</li>';});
+  h+='</ul></div>';
+  return h;
+}
+
+function renderProblem(p,si,qi){
+  var id='q'+(si+1)+'-'+(qi+1);
+  var h='<article class="q" id="'+id+'" data-ans="'+p.ans+'"><h3>문제 '+(qi+1)+'</h3>';
+  h+='<p class="setup">'+esc(p.spec.intro)+'</p>';
+  if(p.spec.says){
+    h+='<ul class="says">';
+    p.spec.says.forEach(function(a){h+='<li><b>'+a.who+'</b>'+esc(a.text)+'</li>';});
+    h+='</ul>';
+  }
+  h+='<p class="lab">조건</p><ul class="conds">';
+  p.conds.forEach(function(c){h+='<li>'+esc(c)+'</li>';});
+  h+='</ul><p class="ask">'+esc(p.qtext)+'</p><ol class="choices">';
+  p.order.forEach(function(c,i){
+    h+='<li><button type="button" class="opt" data-i="'+i+'" aria-pressed="false"><span class="bub">'+(i+1)+'</span><span class="txt">'+esc(c.text)+'</span></button></li>';
+  });
+  h+='</ol><details class="ans"><summary>정답과 풀이 보기</summary><div class="body">'+explain(p)+'</div></details></article>';
+  return h;
+}
+
+function renderAll(){
+  var sets=buildAll(),h='';
+  sets.forEach(function(s,si){
+    h+='<section class="set" id="'+s.id+'"><div class="set-head"><h2>'+s.title+'</h2><span class="tag">'+s.sub+'</span></div>'
+      +'<p class="set-intro">'+esc(s.intro)+'</p>'
+      +'<div class="set-tools"><button type="button" class="btn" data-toggle="'+s.id+'">풀이 모두 펼치기</button></div>';
+    s.probs.forEach(function(p,qi){h+=renderProblem(p,si,qi);});
+    h+='</section>';
+  });
+  document.getElementById('root').innerHTML=h;
+}
+renderAll();
+
+document.getElementById('root').addEventListener('click',function(e){
+  var opt=e.target.closest('.opt');
+  if(opt){
+    var q=opt.closest('.q'),i=+opt.getAttribute('data-i'),ans=+q.getAttribute('data-ans');
+    q.querySelectorAll('.opt').forEach(function(b){b.setAttribute('aria-pressed',b===opt?'true':'false');});
+    var m=q.querySelector('.mine');
+    if(i===ans){m.className='mine ok';m.textContent='내가 고른 답은 '+(i+1)+'번, 맞았어.';}
+    else{m.className='mine no';m.textContent='내가 고른 답은 '+(i+1)+'번, 아쉽게 틀렸어. 정답은 '+(ans+1)+'번이야.';}
+    return;
+  }
+  var t=e.target.closest('[data-toggle]');
+  if(t){
+    var sec=document.getElementById(t.getAttribute('data-toggle'));
+    var open=t.getAttribute('data-open')!=='1';
+    sec.querySelectorAll('details.ans').forEach(function(d){d.open=open;});
+    t.setAttribute('data-open',open?'1':'0');
+    t.textContent=open?'풀이 모두 접기':'풀이 모두 펼치기';
+  }
+});
+</script>
+
+</body></html>

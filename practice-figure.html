@@ -1,0 +1,401 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:9;background:#28498a;color:#fff;font:600 13px system-ui,sans-serif;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2)">← 목록</a>
+<title>도형추리 연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* 레이아웃: 시험지처럼 한 줄 칼럼. 규칙 상자 위, 보기 아래, 풀이는 접어서 숨김. */
+:root{
+  --bg:#f2f4f8;
+  --surface:#ffffff;
+  --ink:#1b2231;
+  --muted:#586176;
+  --rule:#c7cedb;
+  --soft:#e6ebf4;
+  --shade:#cdd5e4;
+  --accent:#2c52d4;
+  --accent-ink:#ffffff;
+  --good:#17725a;
+  --bad:#b3362e;
+  --font-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12151c;--surface:#1a1f2a;--ink:#e8ecf4;--muted:#9ba5ba;--rule:#384257;--soft:#232a38;--shade:#3b4559;
+    --accent:#87a0ff;--accent-ink:#0e1322;--good:#5ccfa4;--bad:#ff9087;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12151c;--surface:#1a1f2a;--ink:#e8ecf4;--muted:#9ba5ba;--rule:#384257;--soft:#232a38;--shade:#3b4559;
+  --accent:#87a0ff;--accent-ink:#0e1322;--good:#5ccfa4;--bad:#ff9087;color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.65;padding-inline:16px;padding-block:28px 56px}
+.wrap{max-width:760px;margin-inline:auto}
+h1,h2,h3,h4,p,ul,ol,dl,dd{margin:0}
+h1,h2,h3{text-wrap:balance}
+
+/* 머리말 */
+.kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+h1{font-size:30px;line-height:1.25;font-weight:600;margin-top:6px}
+.lead{margin-top:10px;color:var(--muted);max-width:60ch}
+.notes{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin-top:20px;padding-block:14px;border-block:1px solid var(--rule)}
+.notes dt{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--muted);padding-top:3px}
+.notes dd{min-width:0;max-width:62ch}
+.jump{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.jump a{color:var(--accent);text-decoration:none;font-weight:500;border:1px solid var(--rule);border-radius:999px;padding:4px 14px;background:var(--surface)}
+.jump a:hover{border-color:var(--accent)}
+
+/* 세트 */
+.set{margin-top:44px}
+.set-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.set-head h2{font-size:22px;font-weight:600}
+.tag{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;color:var(--accent);border:1px solid currentColor;border-radius:4px;padding:1px 8px}
+.set-intro{margin-top:6px;color:var(--muted);max-width:62ch}
+.task{margin-top:14px;font-weight:500}
+.set-tools{margin-top:12px}
+.btn{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:5px 12px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 문제 */
+.q{margin-top:26px;padding-top:22px;border-top:1px solid var(--rule)}
+.q h3{font-family:var(--font-mono);font-size:13px;letter-spacing:.1em;color:var(--muted);font-weight:500;text-transform:uppercase}
+.rule{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1.5px solid var(--ink);background:var(--surface);margin-top:10px;max-width:520px}
+.rule .c{display:grid;place-items:center;padding:10px;min-width:0}
+.rule .c:not(:nth-child(3n)){border-right:1px solid var(--rule)}
+.rule .c:nth-child(-n+3){border-bottom:1px solid var(--rule)}
+.fig{display:block;width:100%;height:auto;aspect-ratio:1;max-width:116px}
+.fig .frame{fill:none;stroke:var(--ink);stroke-width:1.8}
+.fig .thin{stroke:var(--ink);stroke-width:1.4}
+.fig .diag{stroke:var(--ink);stroke-width:1.8}
+.fig .dot{fill:var(--ink)}
+.fig .shade{fill:var(--shade)}
+.fig .sh{fill:none;stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round}
+.fig .sh.on{fill:var(--ink)}
+.blank{display:grid;place-items:center;width:100%;max-width:116px;aspect-ratio:1;border:1.5px dashed var(--rule);font-family:var(--font-mono);font-size:15px;color:var(--muted)}
+
+.choices{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:10px}
+.opt{font:inherit;color:inherit;width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.bub{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);font-family:var(--font-mono);font-size:13px}
+.opt[aria-pressed="true"] .bub{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pair{display:flex;gap:10px;min-width:0}
+.f{display:grid;gap:2px;justify-items:center}
+.f i{font-style:normal;font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.f .fig{width:76px;height:76px}
+
+/* 정답과 풀이 */
+.ans{margin-top:14px}
+.ans summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;font-weight:500;color:var(--accent);padding-block:4px}
+.ans summary::-webkit-details-marker{display:none}
+.ans summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.ans[open] summary::before{transform:rotate(45deg)}
+.body{margin-top:8px;padding:14px 16px;background:var(--soft);border-radius:8px;display:grid;gap:12px;max-width:68ch}
+.verdict{font-size:17px}
+.verdict b{color:var(--good)}
+.mine{font-size:14px}
+.mine.ok{color:var(--good)}
+.mine.no{color:var(--bad)}
+.body h4{font-size:13px;font-family:var(--font-mono);letter-spacing:.06em;color:var(--muted);font-weight:500;margin-bottom:2px}
+.body ul{padding-left:18px;display:grid;gap:4px}
+@media (prefers-reduced-motion: reduce){.ans summary::before{transition:none}}
+@media (max-width:420px){h1{font-size:26px}.rule .c{padding:6px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">DCAT 도형추리</p>
+    <h1>도형추리 연습</h1>
+    <p class="lead">두 세트, 세트마다 다섯 문제야. 보기는 (A)와 (B)가 짝으로 묶여 있어서 둘 다 맞는 번호를 고르면 돼.</p>
+    <dl class="notes">
+      <dt>푸는 순서</dt>
+      <dd>윗줄 규칙으로 (A)가 어긋난 보기를 먼저 지우고, 아랫줄 규칙으로 (B)가 어긋난 보기를 지워. 남는 하나가 답이야.</dd>
+      <dt>문제 구성</dt>
+      <dd>윗줄과 아랫줄 규칙이 각각 하나로만 해석되게 만들었어. 같은 그림이 회전으로도 반전으로도 읽히는 문제는 없어.</dd>
+    </dl>
+    <nav class="jump" aria-label="세트 이동"><a href="#set1">세트 1 기본</a><a href="#set2">세트 2 심화</a></nav>
+  </header>
+  <main id="root"></main>
+</div>
+
+<script>
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(arr,rng){for(var i=arr.length-1;i>0;i--){var j=Math.floor(rng()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
+
+/* ---------- 격자 그림: 2x2 격자 안의 대각선 하나와 점 하나 ---------- */
+var GEOM={
+  rotCW:{name:'시계 방향으로 90도 회전',f:function(x,y){return [2-y,x];}},
+  rotCCW:{name:'반시계 방향으로 90도 회전',f:function(x,y){return [y,2-x];}},
+  rot180:{name:'180도 회전',f:function(x,y){return [2-x,2-y];}},
+  flipH:{name:'좌우 반전',f:function(x,y){return [2-x,y];}},
+  flipV:{name:'상하 반전',f:function(x,y){return [x,2-y];}}
+};
+var GEOM_INV={rotCW:'rotCCW',rotCCW:'rotCW',rot180:'rot180',flipH:'flipH',flipV:'flipV'};
+var SWAP_TXT=' + 점이 대각선 반대쪽으로 이동';
+function gridRuleName(t){return GEOM[t.geom].name+(t.swap?SWAP_TXT:'');}
+function gridInvName(t){return GEOM[GEOM_INV[t.geom]].name+(t.swap?SWAP_TXT:'');}
+
+function r3(v){return Math.round(v*1000);}
+function gridKey(g){
+  var e=[[r3(g.a[0]),r3(g.a[1])],[r3(g.b[0]),r3(g.b[1])]].sort(function(p,q){return p[0]-q[0]||p[1]-q[1];});
+  return JSON.stringify([e,[r3(g.dot[0]),r3(g.dot[1])],[r3(g.sh[0]),r3(g.sh[1])]]);
+}
+function makeGrid(r,c,diag,half,vert){
+  var a,b,dot,sh=vert?[c+0.5,(1-r)+0.5]:[(1-c)+0.5,r+0.5];
+  if(diag==='\\'){a=[c,r];b=[c+1,r+1];dot=half===0?[c+2/3,r+1/3]:[c+1/3,r+2/3];}
+  else{a=[c+1,r];b=[c,r+1];dot=half===0?[c+1/3,r+1/3]:[c+2/3,r+2/3];}
+  return {a:a,b:b,dot:dot,sh:sh};
+}
+function swapDot(g){
+  var cx=(g.a[0]+g.b[0])/2,cy=(g.a[1]+g.b[1])/2;
+  return {a:g.a,b:g.b,dot:[2*cx-g.dot[0],2*cy-g.dot[1]],sh:g.sh};
+}
+function geomGrid(g,geom){
+  var f=GEOM[geom].f;
+  return {a:f(g.a[0],g.a[1]),b:f(g.b[0],g.b[1]),dot:f(g.dot[0],g.dot[1]),sh:f(g.sh[0],g.sh[1])};
+}
+function applyGrid(g,geom,swap){var h=geomGrid(g,geom);return swap?swapDot(h):h;}
+function invGrid(g,geom,swap){var h=swap?swapDot(g):g;return geomGrid(h,GEOM_INV[geom]);}
+var GRID_LIB=[];
+Object.keys(GEOM).forEach(function(g){[false,true].forEach(function(s){GRID_LIB.push({geom:g,swap:s});});});
+function gridCandidates(X,Y){return GRID_LIB.filter(function(t){return gridKey(applyGrid(X,t.geom,t.swap))===gridKey(Y);});}
+function gridSim(u,v){
+  function mid(g){return r3((g.a[0]+g.b[0])/2)+','+r3((g.a[1]+g.b[1])/2);}
+  function ends(g){return [r3(g.a[0])+','+r3(g.a[1]),r3(g.b[0])+','+r3(g.b[1])].sort().join('/');}
+  function dot(g){return r3(g.dot[0])+','+r3(g.dot[1]);}
+  function sh(g){return r3(g.sh[0])+','+r3(g.sh[1]);}
+  return (mid(u)===mid(v)?1:0)+(ends(u)===ends(v)?1:0)+(dot(u)===dot(v)?1:0)+(sh(u)===sh(v)?1:0);
+}
+
+/* ---------- 도형 배치 그림: 2x2 칸에 네모, 삼각형, 원 (빈 칸 하나) ---------- */
+var SHAPES=['sq','tri','cir'];
+var PERM={id:[0,1,2,3],rotCW:[1,3,0,2],rotCCW:[2,0,3,1],rot180:[3,2,1,0],flipH:[1,0,3,2],flipV:[2,3,0,1]};
+var PERM_NAME={id:'위치는 그대로',rotCW:'도형이 시계 방향으로 한 칸씩 이동',rotCCW:'도형이 반시계 방향으로 한 칸씩 이동',rot180:'도형이 대각선 반대편 칸으로 이동',flipH:'도형이 좌우 칸으로 자리를 맞바꿈',flipV:'도형이 위아래 칸으로 자리를 맞바꿈'};
+var FILL_NAME={keep:'색은 그대로',all:'모든 도형의 색 반전(빈 것은 채워지고 채워진 것은 비워짐)',sq:'네모만 색 반전',tri:'삼각형만 색 반전',cir:'원만 색 반전'};
+function slotRuleName(perm,fill){
+  if(perm==='id'&&fill==='keep')return '변화 없음';
+  if(fill==='keep')return PERM_NAME[perm];
+  if(perm==='id')return FILL_NAME[fill];
+  return PERM_NAME[perm]+', '+FILL_NAME[fill];
+}
+function applySlots(s,perm,fill){
+  var out=[null,null,null,null];
+  s.forEach(function(it,i){
+    if(!it)return;
+    var n={shape:it.shape,filled:it.filled};
+    if(fill==='all'||fill===it.shape)n.filled=!n.filled;
+    out[PERM[perm][i]]=n;
+  });
+  return out;
+}
+function cellKey(it){return it?it.shape+(it.filled?'1':'0'):'-';}
+function slotKey(s){return s.map(cellKey).join('|');}
+var SLOT_LIB=[];
+Object.keys(PERM).forEach(function(p){['keep','all','sq','tri','cir'].forEach(function(f){SLOT_LIB.push({perm:p,fill:f});});});
+function slotSim(s,t){var n=0;for(var i=0;i<4;i++){if(cellKey(s[i])===cellKey(t[i]))n++;}return n;}
+
+function randGrid(rng){return makeGrid(Math.floor(rng()*2),Math.floor(rng()*2),rng()<0.5?'\\':'/',rng()<0.5?0:1,rng()<0.5);}
+function randSlots(rng){
+  var empty=Math.floor(rng()*4),order=shuffle(SHAPES.slice(),rng),s=[null,null,null,null],k=0;
+  for(var i=0;i<4;i++){if(i===empty)continue;s[i]={shape:order[k++],filled:rng()<0.5};}
+  return s;
+}
+function sortedBy(list,simFn,rng){
+  shuffle(list,rng);
+  return list.sort(function(a,b){return simFn(b.fig)-simFn(a.fig);});
+}
+
+/* ---------- 문제 만들기 ---------- */
+function buildProblem(spec,seed){
+  var rng=mulberry32(seed);
+  for(var tries=0;tries<2000;tries++){
+    var X=randGrid(rng);
+    var Y=applyGrid(X,spec.top.geom,spec.top.swap);
+    var A=invGrid(X,spec.top.geom,spec.top.swap);
+    if(gridCandidates(X,Y).length!==1)continue;
+
+    var P=randSlots(rng);
+    var filled=P.filter(function(it){return it&&it.filled;}).length;
+    if(filled<1||filled>2)continue;
+    var Q=applySlots(P,spec.bot.perm,spec.bot.fill);
+    var B=applySlots(Q,spec.bot.perm,spec.bot.fill);
+    var cands=SLOT_LIB.filter(function(t){return slotKey(applySlots(P,t.perm,t.fill))===slotKey(Q);});
+    if(cands.length!==1)continue;
+    if(slotKey(P)===slotKey(Q))continue;
+    var back=slotKey(B)===slotKey(P);
+    if(back&&!spec.allowReturn)continue;
+    if(!back&&spec.allowReturn)continue;
+
+    var aC=[],seenA={};seenA[gridKey(A)]=1;
+    GRID_LIB.forEach(function(t){
+      if(t.geom===spec.top.geom&&t.swap===spec.top.swap)return;
+      var f=invGrid(X,t.geom,t.swap),k=gridKey(f);
+      if(seenA[k])return;seenA[k]=1;
+      aC.push({fig:f,how:gridRuleName(t)+' 규칙으로 되돌린 모양'});
+    });
+    var ky=gridKey(Y);
+    if(!seenA[ky]){seenA[ky]=1;aC.push({fig:Y,how:'오른쪽 그림을 그대로 가져온 모양'});}
+    var bC=[],seenB={};seenB[slotKey(B)]=1;
+    SLOT_LIB.forEach(function(t){
+      if(t.perm===spec.bot.perm&&t.fill===spec.bot.fill)return;
+      var f=applySlots(Q,t.perm,t.fill),k=slotKey(f);
+      if(seenB[k])return;seenB[k]=1;
+      var how=(t.perm==='id'&&t.fill==='keep')?'가운데 그림과 같아서, 규칙을 한 번도 적용하지 않은 모양':slotRuleName(t.perm,t.fill)+' 규칙을 적용한 모양';
+      bC.push({fig:f,how:how});
+    });
+    if(aC.length<3||bC.length<8)continue;
+    sortedBy(aC,function(f){return gridSim(f,A);},rng);
+    sortedBy(bC,function(f){return slotSim(f,B);},rng);
+    var a1=aC[0],a2=aC[1],a3=aC[2];
+    var b1=bC[0],b2=bC[1+Math.floor(rng()*3)],b3=bC[4+Math.floor(rng()*4)];
+
+    var choices=[
+      {A:A,B:B,ok:true},
+      {A:A,B:b1.fig,bHow:b1.how},
+      {A:a1.fig,B:B,aHow:a1.how},
+      {A:a2.fig,B:b2.fig,aHow:a2.how,bHow:b2.how}
+    ];
+    choices.push(spec.v?{A:a3.fig,B:B,aHow:a3.how}:{A:A,B:b3.fig,bHow:b3.how});
+
+    var wrong=shuffle(choices.slice(1),rng),order=[],w=0;
+    for(var i=0;i<5;i++)order.push(i===spec.ans?choices[0]:wrong[w++]);
+    return {spec:spec,X:X,Y:Y,A:A,P:P,Q:Q,B:B,order:order,ans:spec.ans,back:back};
+  }
+  throw new Error('문제를 만들지 못함: '+JSON.stringify(spec));
+}
+
+var SETS=[
+  {id:'set1',title:'세트 1',sub:'기본',
+   intro:'규칙이 하나씩만 들어가. 윗줄은 회전이나 반전, 아랫줄은 도형이 자리를 옮기거나 색이 바뀌는 규칙이야.',
+   probs:[
+    {top:{geom:'rotCW',swap:false},bot:{perm:'rotCW',fill:'keep'},ans:2,v:false,allowReturn:false},
+    {top:{geom:'flipV',swap:false},bot:{perm:'id',fill:'all'},ans:0,v:true,allowReturn:true},
+    {top:{geom:'rotCCW',swap:false},bot:{perm:'rotCCW',fill:'keep'},ans:4,v:false,allowReturn:false},
+    {top:{geom:'rot180',swap:false},bot:{perm:'rotCW',fill:'all'},ans:1,v:true,allowReturn:false},
+    {top:{geom:'flipH',swap:false},bot:{perm:'rotCCW',fill:'all'},ans:3,v:false,allowReturn:false}
+   ]},
+  {id:'set2',title:'세트 2',sub:'심화',
+   intro:'규칙이 겹쳐. 윗줄은 회전이나 반전에 점 이동이 붙기도 하고, 아랫줄은 자리 이동에 특정 도형만 색이 바뀌는 규칙이 붙어.',
+   probs:[
+    {top:{geom:'rotCW',swap:true},bot:{perm:'rotCW',fill:'sq'},ans:1,v:false,allowReturn:false},
+    {top:{geom:'flipH',swap:true},bot:{perm:'rotCCW',fill:'all'},ans:4,v:true,allowReturn:false},
+    {top:{geom:'rotCCW',swap:false},bot:{perm:'rotCW',fill:'tri'},ans:0,v:false,allowReturn:false},
+    {top:{geom:'rot180',swap:true},bot:{perm:'rotCCW',fill:'cir'},ans:3,v:true,allowReturn:false},
+    {top:{geom:'flipV',swap:true},bot:{perm:'flipV',fill:'sq'},ans:2,v:false,allowReturn:true}
+   ]}
+];
+
+function buildAll(){
+  return SETS.map(function(s,si){
+    return {id:s.id,title:s.title,sub:s.sub,intro:s.intro,
+      probs:s.probs.map(function(sp,qi){return buildProblem(sp,7000+si*131+qi*29);})};
+  });
+}
+
+if(typeof module!=='undefined')module.exports={buildAll:buildAll,gridKey:gridKey,slotKey:slotKey,gridCandidates:gridCandidates,SLOT_LIB:SLOT_LIB,applySlots:applySlots,applyGrid:applyGrid,invGrid:invGrid};
+
+
+/* ---------- 그리기 ---------- */
+function svgWrap(inner){return '<svg class="fig" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';}
+function px(v){return (6+v*44).toFixed(2);}
+function gridSvg(g){
+  var col=Math.floor(g.sh[0]),row=Math.floor(g.sh[1]);
+  var s='<rect x="'+(6+col*44)+'" y="'+(6+row*44)+'" width="44" height="44" class="shade"/>';
+  s+='<rect x="6" y="6" width="88" height="88" class="frame"/>';
+  s+='<line x1="50" y1="6" x2="50" y2="94" class="thin"/><line x1="6" y1="50" x2="94" y2="50" class="thin"/>';
+  s+='<line x1="'+px(g.a[0])+'" y1="'+px(g.a[1])+'" x2="'+px(g.b[0])+'" y2="'+px(g.b[1])+'" class="diag"/>';
+  s+='<circle cx="'+px(g.dot[0])+'" cy="'+px(g.dot[1])+'" r="3.6" class="dot"/>';
+  return svgWrap(s);
+}
+var SC=[[28,28],[72,28],[28,72],[72,72]];
+function slotsSvg(s){
+  var out='<rect x="6" y="6" width="88" height="88" class="frame"/>';
+  s.forEach(function(it,i){
+    if(!it)return;
+    var cx=SC[i][0],cy=SC[i][1],cls=it.filled?'sh on':'sh';
+    if(it.shape==='sq')out+='<rect x="'+(cx-10)+'" y="'+(cy-10)+'" width="20" height="20" class="'+cls+'"/>';
+    else if(it.shape==='cir')out+='<circle cx="'+cx+'" cy="'+cy+'" r="11" class="'+cls+'"/>';
+    else out+='<polygon points="'+cx+','+(cy-12)+' '+(cx-11.5)+','+(cy+9)+' '+(cx+11.5)+','+(cy+9)+'" class="'+cls+'"/>';
+  });
+  return svgWrap(out);
+}
+
+/* ---------- 풀이 글 ---------- */
+function nums(list){return list.length?list.map(function(i){return (i+1)+'번';}).join(', '):'없음';}
+function explain(p){
+  var s=p.spec,aW=[],bW=[],items='';
+  p.order.forEach(function(c,i){
+    if(i===p.ans)return;
+    var parts=[];
+    if(c.aHow){aW.push(i);parts.push('(A)가 틀려. '+c.aHow+'이야.');}
+    if(c.bHow){bW.push(i);parts.push('(B)가 틀려. '+c.bHow+'이야.');}
+    items+='<li><b>'+(i+1)+'번</b> '+parts.join(' ')+'</li>';
+  });
+  var h='<p class="verdict">정답 <b>'+(p.ans+1)+'번</b></p><p class="mine" aria-live="polite"></p>';
+  h+='<div><h4>윗줄, 격자 그림</h4><p>규칙은 <b>'+gridRuleName(s.top)+'</b>. 가운데 그림에서 오른쪽 그림으로 갈 때 이 규칙이 적용돼. 다른 회전이나 반전으로는 오른쪽 그림이 나오지 않아서 규칙이 하나로 정해져. (A)에서 가운데 그림으로 올 때도 같은 규칙이라서, (A)는 가운데 그림을 거꾸로 되돌린 모양이야. 되돌리는 방법은 '+gridInvName(s.top)+'이야.</p></div>';
+  h+='<div><h4>아랫줄, 도형 그림</h4><p>규칙은 <b>'+slotRuleName(s.bot.perm,s.bot.fill)+'</b>. 첫 번째 그림에서 두 번째 그림으로 바뀐 방식이 이 규칙이고, 같은 변화를 한 번 더 하면 (B)가 돼.'+(p.back?' 두 번 적용하면 처음 모양으로 돌아오는 교대 규칙이라서 (B)는 첫 번째 그림과 같아.':'')+'</p></div>';
+  h+='<div><h4>보기 지우기</h4><p>윗줄에서 지워지는 보기: '+nums(aW)+'. 아랫줄에서 지워지는 보기: '+nums(bW)+'.</p><ul>'+items+'</ul></div>';
+  return h;
+}
+
+/* ---------- 문제 한 개 ---------- */
+function renderProblem(p,si,qi){
+  var id='q'+(si+1)+'-'+(qi+1);
+  var h='<article class="q" id="'+id+'" data-ans="'+p.ans+'"><h3>문제 '+(qi+1)+'</h3>';
+  h+='<div class="rule">'
+    +'<div class="c"><div class="blank">(A)</div></div><div class="c">'+gridSvg(p.X)+'</div><div class="c">'+gridSvg(p.Y)+'</div>'
+    +'<div class="c">'+slotsSvg(p.P)+'</div><div class="c">'+slotsSvg(p.Q)+'</div><div class="c"><div class="blank">(B)</div></div>'
+    +'</div>';
+  h+='<ol class="choices">';
+  p.order.forEach(function(c,i){
+    h+='<li><button type="button" class="opt" data-i="'+i+'" aria-pressed="false" aria-label="'+(i+1)+'번 보기">'
+      +'<span class="bub">'+(i+1)+'</span><span class="pair">'
+      +'<span class="f"><i>(A)</i>'+gridSvg(c.A)+'</span><span class="f"><i>(B)</i>'+slotsSvg(c.B)+'</span>'
+      +'</span></button></li>';
+  });
+  h+='</ol>';
+  h+='<details class="ans"><summary>정답과 풀이 보기</summary><div class="body">'+explain(p)+'</div></details>';
+  return h+'</article>';
+}
+
+function renderAll(){
+  var sets=buildAll(),h='';
+  sets.forEach(function(s,si){
+    h+='<section class="set" id="'+s.id+'"><div class="set-head"><h2>'+s.title+'</h2><span class="tag">'+s.sub+'</span></div>'
+      +'<p class="set-intro">'+s.intro+'</p>'
+      +'<p class="task">다음 제시된 도형의 규칙을 이용하여 (A), (B)에 들어갈 도형으로 알맞은 것을 고르면?</p>'
+      +'<div class="set-tools"><button type="button" class="btn" data-toggle="'+s.id+'">풀이 모두 펼치기</button></div>';
+    s.probs.forEach(function(p,qi){h+=renderProblem(p,si,qi);});
+    h+='</section>';
+  });
+  document.getElementById('root').innerHTML=h;
+}
+renderAll();
+
+document.getElementById('root').addEventListener('click',function(e){
+  var opt=e.target.closest('.opt');
+  if(opt){
+    var q=opt.closest('.q'),i=+opt.getAttribute('data-i'),ans=+q.getAttribute('data-ans');
+    q.querySelectorAll('.opt').forEach(function(b){b.setAttribute('aria-pressed',b===opt?'true':'false');});
+    var m=q.querySelector('.mine');
+    if(i===ans){m.className='mine ok';m.textContent='내가 고른 답은 '+(i+1)+'번, 맞았어.';}
+    else{m.className='mine no';m.textContent='내가 고른 답은 '+(i+1)+'번, 아쉽게 틀렸어. 정답은 '+(ans+1)+'번이야.';}
+    return;
+  }
+  var t=e.target.closest('[data-toggle]');
+  if(t){
+    var sec=document.getElementById(t.getAttribute('data-toggle'));
+    var ds=sec.querySelectorAll('details.ans');
+    var open=t.getAttribute('data-open')!=='1';
+    ds.forEach(function(d){d.open=open;});
+    t.setAttribute('data-open',open?'1':'0');
+    t.textContent=open?'풀이 모두 접기':'풀이 모두 펼치기';
+  }
+});
+</script>
+
+</body></html>
